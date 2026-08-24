@@ -9,7 +9,7 @@
     body { font-family: system-ui, -apple-system, sans-serif; }
     .card { @apply bg-white rounded-xl shadow-sm border border-gray-100; }
 
-    /* Evita que el celular seleccione texto al hacer tap */
+    /* Evita que los dispositivos móviles seleccionen texto al presionar elementos */
     button, a, .cursor-pointer {
       -webkit-user-select: none;
       user-select: none;
@@ -22,21 +22,21 @@
     <!-- Encabezado -->
     <header class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold text-gray-800">Taller Mecánico</h1>
-      <button onclick="logout()" class="text-sm text-red-600 hover:underline">Cerrar sesión</button>
+      <button type="button" onclick="logout()" class="text-sm text-red-600 hover:underline">Cerrar sesión</button>
     </header>
 
     <!-- Pestañas de navegación -->
     <nav class="flex gap-2 mb-6 border-b border-gray-200">
-      <button onclick="switchTab('vehicles')" id="tab-vehicles" class="px-4 py-2 font-medium border-b-2 border-blue-600 text-blue-600">Vehículos</button>
-      <button onclick="switchTab('clients')" id="tab-clients" class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Clientes</button>
-      <button onclick="switchTab('services')" id="tab-services" class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Servicios</button>
+      <button type="button" onclick="switchTab('vehicles')" id="tab-vehicles" class="px-4 py-2 font-medium border-b-2 border-blue-600 text-blue-600">Vehículos</button>
+      <button type="button" onclick="switchTab('clients')" id="tab-clients" class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Clientes</button>
+      <button type="button" onclick="switchTab('services')" id="tab-services" class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Servicios</button>
     </nav>
 
     <!-- Vista: Vehículos -->
     <section id="sec-vehicles" class="space-y-4">
-      <div class="flex justify-between items-center">
+      <div class="flex justify-between items-center gap-2">
         <input type="text" id="search-input" placeholder="Buscar por patente, cliente, marca..." class="w-full md:w-64 px-3 py-2 border rounded-lg" onkeyup="filterVehicles()">
-        <button onclick="openVehicleModal()" class="ml-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700">+ Nuevo Vehículo</button>
+        <button type="button" onclick="openVehicleModal()" class="shrink-0 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700">+ Nuevo Vehículo</button>
       </div>
       <div class="card overflow-hidden">
         <div id="vehicles-list" class="divide-y divide-gray-100">
@@ -49,7 +49,7 @@
     <section id="sec-clients" class="hidden space-y-4">
       <div class="flex justify-between items-center">
         <h2 class="text-xl font-bold">Clientes</h2>
-        <button onclick="openClientModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700">+ Nuevo Cliente</button>
+        <button type="button" onclick="openClientModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700">+ Nuevo Cliente</button>
       </div>
       <div class="card overflow-hidden">
         <div id="clients-list" class="divide-y divide-gray-100">
@@ -62,7 +62,7 @@
     <section id="sec-services" class="hidden space-y-4">
       <div class="flex justify-between items-center">
         <h2 class="text-xl font-bold">Catálogo de Servicios</h2>
-        <button onclick="openServiceModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700">+ Nuevo Servicio</button>
+        <button type="button" onclick="openServiceModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700">+ Nuevo Servicio</button>
       </div>
       <div class="card overflow-hidden">
         <div id="services-list" class="divide-y divide-gray-100">
@@ -73,7 +73,7 @@
   </div>
 
   <!-- Modal: Nuevo/Editar Vehículo -->
-  <div id="modal-vehicle" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4">
+  <div id="modal-vehicle" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4">
       <h3 class="text-lg font-bold" id="modal-vehicle-title">Nuevo Vehículo</h3>
       <form id="form-vehicle" onsubmit="saveVehicle(event)">
@@ -117,7 +117,7 @@
   </div>
 
   <!-- Modal: Cliente -->
-  <div id="modal-client" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4">
+  <div id="modal-client" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4">
       <h3 class="text-lg font-bold" id="modal-client-title">Nuevo Cliente</h3>
       <form id="form-client" onsubmit="saveClient(event)">
@@ -145,14 +145,14 @@
   </div>
 
   <!-- Modal: Detalle del Vehículo -->
-  <div id="modal-detail" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 overflow-y-auto">
+  <div id="modal-detail" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 overflow-y-auto z-50">
     <div class="bg-white rounded-xl max-w-2xl w-full p-6 space-y-6 my-8">
       <div class="flex justify-between items-start border-b pb-4">
         <div>
           <h2 class="text-2xl font-bold" id="detail-plate">---</h2>
           <p class="text-gray-600" id="detail-subtitle">---</p>
         </div>
-        <button onclick="closeModal('modal-detail')" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+        <button type="button" onclick="closeModal('modal-detail')" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
       </div>
 
       <!-- Ficha de mantenimiento rápido -->
@@ -211,24 +211,37 @@
   <script>
     let allVehicles = [];
 
-    // Helper API
+    // Helper API con manejo de respuestas seguras
     async function api(url, options = {}) {
-      const res = await fetch(url, {
-        headers: { 'Content-Type': 'application/json' },
-        ...options
-      });
-      if (res.status === 401) window.location.href = '/login.html';
-      return res.json();
+      try {
+        const res = await fetch(url, {
+          headers: { 'Content-Type': 'application/json' },
+          ...options
+        });
+        if (res.status === 401) {
+          window.location.href = '/login.html';
+          return null;
+        }
+        return await res.json();
+      } catch (err) {
+        console.error("Error al conectar con la API:", err);
+        return null;
+      }
     }
 
-    // Navegación
+    // Navegación entre pestañas
     function switchTab(tab) {
       ['vehicles', 'clients', 'services'].forEach(t => {
-        document.getElementById(`sec-${t}`).classList.add('hidden');
-        document.getElementById(`tab-${t}`).className = 'px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700';
+        const sec = document.getElementById(`sec-${t}`);
+        const tabBtn = document.getElementById(`tab-${t}`);
+        if (sec) sec.classList.add('hidden');
+        if (tabBtn) tabBtn.className = 'px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700';
       });
-      document.getElementById(`sec-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-${tab}`).className = 'px-4 py-2 font-medium border-b-2 border-blue-600 text-blue-600';
+
+      const activeSec = document.getElementById(`sec-${tab}`);
+      const activeTabBtn = document.getElementById(`tab-${tab}`);
+      if (activeSec) activeSec.classList.remove('hidden');
+      if (activeTabBtn) activeTabBtn.className = 'px-4 py-2 font-medium border-b-2 border-blue-600 text-blue-600';
       
       if (tab === 'vehicles') loadVehicles();
       if (tab === 'clients') loadClients();
@@ -237,26 +250,37 @@
 
     // Cargar Vehículos
     async function loadVehicles() {
-      allVehicles = await api('/api/vehicles');
+      const res = await api('/api/vehicles');
+      allVehicles = Array.isArray(res) ? res : (res && res.vehicles && Array.isArray(res.vehicles) ? res.vehicles : []);
       renderVehicles(allVehicles);
     }
 
     // Renderizado táctil optimizado para móviles (usa elementos <button>)
     function renderVehicles(list) {
-      document.getElementById('vehicles-list').innerHTML = list.length ? list.map(v => `
+      const container = document.getElementById('vehicles-list');
+      if (!container) return;
+
+      if (!Array.isArray(list) || list.length === 0) {
+        container.innerHTML = '<p class="p-4 text-gray-400">No hay vehículos</p>';
+        return;
+      }
+
+      container.innerHTML = list.map(v => `
         <button type="button" class="w-full text-left p-4 flex justify-between items-center hover:bg-gray-50 active:bg-gray-100 transition-colors border-b last:border-0" onclick="openVehicleDetail(${v.id})">
           <div>
-            <p class="font-medium text-lg text-gray-900">${v.plate}</p>
+            <p class="font-medium text-lg text-gray-900">${v.plate || ''}</p>
             <p class="text-sm text-gray-600">${v.brand || ''} ${v.model || ''} ${v.year || ''}</p>
             <p class="text-xs text-gray-400">${v.client_name || 'Sin cliente'} · ${v.current_km || 0} km</p>
           </div>
           <span class="text-blue-600 text-sm font-medium pointer-events-none">Ver →</span>
         </button>
-      `).join('') : '<p class="p-4 text-gray-400">No hay vehículos</p>';
+      `).join('');
     }
 
     function filterVehicles() {
-      const q = document.getElementById('search-input').value.toLowerCase();
+      const input = document.getElementById('search-input');
+      if (!input || !Array.isArray(allVehicles)) return;
+      const q = input.value.toLowerCase();
       const filtered = allVehicles.filter(v => 
         (v.plate && v.plate.toLowerCase().includes(q)) ||
         (v.brand && v.brand.toLowerCase().includes(q)) ||
@@ -268,11 +292,15 @@
 
     // Cargar Clientes
     async function loadClients() {
-      const clients = await api('/api/clients');
-      document.getElementById('clients-list').innerHTML = clients.length ? clients.map(c => `
+      const res = await api('/api/clients');
+      const clients = Array.isArray(res) ? res : [];
+      const container = document.getElementById('clients-list');
+      if (!container) return;
+
+      container.innerHTML = clients.length ? clients.map(c => `
         <div class="p-4 flex justify-between items-center border-b last:border-0">
           <div>
-            <p class="font-medium text-gray-900">${c.name}</p>
+            <p class="font-medium text-gray-900">${c.name || ''}</p>
             <p class="text-sm text-gray-500">${c.phone || ''} ${c.email ? '· ' + c.email : ''}</p>
           </div>
           <div class="flex gap-2">
@@ -285,11 +313,15 @@
 
     // Cargar Servicios
     async function loadServices() {
-      const services = await api('/api/services');
-      document.getElementById('services-list').innerHTML = services.length ? services.map(s => `
+      const res = await api('/api/services');
+      const services = Array.isArray(res) ? res : [];
+      const container = document.getElementById('services-list');
+      if (!container) return;
+
+      container.innerHTML = services.length ? services.map(s => `
         <div class="p-4 flex justify-between items-center border-b last:border-0">
           <div>
-            <p class="font-medium text-gray-900">${s.name}</p>
+            <p class="font-medium text-gray-900">${s.name || ''}</p>
             <p class="text-xs text-gray-400">Intervalo recomendado: ${s.interval_km ? s.interval_km + ' km' : 'No definido'}</p>
           </div>
         </div>
@@ -298,15 +330,18 @@
 
     // Modal Vehículo
     async function openVehicleModal(vehicle = null) {
-      const clients = await api('/api/clients');
+      const res = await api('/api/clients');
+      const clients = Array.isArray(res) ? res : [];
       const select = document.getElementById('v-client');
-      select.innerHTML = '<option value="">-- Sin cliente --</option>' + 
-        clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      if (select) {
+        select.innerHTML = '<option value="">-- Sin cliente --</option>' + 
+          clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      }
 
       if (vehicle) {
         document.getElementById('modal-vehicle-title').innerText = 'Editar Vehículo';
         document.getElementById('v-id').value = vehicle.id;
-        document.getElementById('v-plate').value = vehicle.plate;
+        document.getElementById('v-plate').value = vehicle.plate || '';
         document.getElementById('v-client').value = vehicle.client_id || '';
         document.getElementById('v-brand').value = vehicle.brand || '';
         document.getElementById('v-model').value = vehicle.model || '';
@@ -341,12 +376,39 @@
       loadVehicles();
     }
 
+    // Modal Cliente
+    function openClientModal() {
+      document.getElementById('modal-client-title').innerText = 'Nuevo Cliente';
+      document.getElementById('form-client').reset();
+      document.getElementById('c-id').value = '';
+      document.getElementById('modal-client').classList.remove('hidden');
+    }
+
+    async function saveClient(e) {
+      e.preventDefault();
+      const id = document.getElementById('c-id').value;
+      const data = {
+        name: document.getElementById('c-name').value,
+        phone: document.getElementById('c-phone').value,
+        email: document.getElementById('c-email').value
+      };
+
+      await api(id ? `/api/clients/${id}` : '/api/clients', {
+        method: id ? 'PUT' : 'POST',
+        body: JSON.stringify(data)
+      });
+
+      closeModal('modal-client');
+      loadClients();
+    }
+
     // Abrir Detalle de Vehículo
     async function openVehicleDetail(id) {
       const data = await api(`/api/vehicles/${id}/detail`);
+      if (!data || !data.vehicle) return;
       const v = data.vehicle;
       
-      document.getElementById('detail-plate').innerText = v.plate;
+      document.getElementById('detail-plate').innerText = v.plate || '';
       document.getElementById('detail-subtitle').innerText = `${v.brand || ''} ${v.model || ''} · ${v.client_name || 'Sin Cliente'}`;
       document.getElementById('w-vehicle-id').value = v.id;
       document.getElementById('w-km').value = v.current_km || '';
@@ -355,31 +417,40 @@
       const statusMap = { oil: 'status-oil', air: 'status-filter-air', fuel: 'status-filter-fuel', belt: 'status-belt' };
       Object.keys(statusMap).forEach(k => {
         const el = document.getElementById(statusMap[k]);
-        if (data.status && data.status[k]) {
-          el.innerText = `${data.status[k].last_km} km`;
-          el.className = data.status[k].alert ? 'font-semibold text-red-600' : 'font-semibold text-green-600';
-        } else {
-          el.innerText = 'Sin registro';
-          el.className = 'font-semibold text-gray-400';
+        if (el) {
+          if (data.status && data.status[k]) {
+            el.innerText = `${data.status[k].last_km} km`;
+            el.className = data.status[k].alert ? 'font-semibold text-red-600' : 'font-semibold text-green-600';
+          } else {
+            el.innerText = 'Sin registro';
+            el.className = 'font-semibold text-gray-400';
+          }
         }
       });
 
       // Cargar lista de servicios en el select del modal
-      const services = await api('/api/services');
-      document.getElementById('w-service').innerHTML = services.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+      const resServ = await api('/api/services');
+      const services = Array.isArray(resServ) ? resServ : [];
+      const wServiceSelect = document.getElementById('w-service');
+      if (wServiceSelect) {
+        wServiceSelect.innerHTML = services.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+      }
 
       // Render Historial
       const historyEl = document.getElementById('work-history');
-      historyEl.innerHTML = data.history.length ? data.history.map(h => `
-        <div class="bg-gray-50 p-3 rounded-lg flex justify-between items-center text-sm border border-gray-100">
-          <div>
-            <p class="font-medium text-gray-900">${h.service_name}</p>
-            <p class="text-xs text-gray-500">${h.notes || 'Sin observaciones'}</p>
-            <span class="text-xs text-gray-400">${new Date(h.date).toLocaleDateString()}</span>
+      if (historyEl) {
+        const history = Array.isArray(data.history) ? data.history : [];
+        historyEl.innerHTML = history.length ? history.map(h => `
+          <div class="bg-gray-50 p-3 rounded-lg flex justify-between items-center text-sm border border-gray-100">
+            <div>
+              <p class="font-medium text-gray-900">${h.service_name || ''}</p>
+              <p class="text-xs text-gray-500">${h.notes || 'Sin observaciones'}</p>
+              <span class="text-xs text-gray-400">${h.date ? new Date(h.date).toLocaleDateString() : ''}</span>
+            </div>
+            <span class="font-bold text-gray-700">${h.km || 0} km</span>
           </div>
-          <span class="font-bold text-gray-700">${h.km} km</span>
-        </div>
-      `).join('') : '<p class="text-gray-400 text-sm">No hay trabajos registrados.</p>';
+        `).join('') : '<p class="text-gray-400 text-sm">No hay trabajos registrados.</p>';
+      }
 
       document.getElementById('modal-detail').classList.remove('hidden');
     }
@@ -402,7 +473,8 @@
 
     // Cierre de Modales
     function closeModal(id) {
-      document.getElementById(id).classList.add('hidden');
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.add('hidden');
     }
 
     async function logout() {
@@ -411,7 +483,9 @@
     }
 
     // Inicializar app
-    loadVehicles();
+    document.addEventListener('DOMContentLoaded', () => {
+      loadVehicles();
+    });
   </script>
 </body>
 </html>
