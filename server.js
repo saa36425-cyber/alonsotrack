@@ -7,7 +7,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const JWT_SECRET = 'alonsotrack-secreto-2026';
 const DB_FILE = path.join(__dirname, 'db.json');
 
