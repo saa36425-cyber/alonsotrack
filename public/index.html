@@ -1,122 +1,374 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AlonsoTrack – Historial de Mantenimiento</title>
+  <title>AlonsoTrack - Taller Mecánico</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3097/3097180.png">
   <meta name="theme-color" content="#1e40af">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3097/3097180.png">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; }
-    .card { @apply bg-white rounded-xl shadow-sm border border-gray-100; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', system-ui, sans-serif; }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
 
-  <!-- LOGIN ADMIN -->
-  <div id="login-view" class="min-h-screen flex items-center justify-center p-4">
-    <div class="card w-full max-w-md p-8">
-      <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-blue-800">AlonsoTrack</h1>
-        <p class="text-gray-500 mt-1">Historial de mantenimiento</p>
+  <!-- LOGIN -->
+  <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-700 px-4">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div class="bg-blue-600 text-white p-8 text-center">
+        <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <span class="text-3xl font-bold">AT</span>
+        </div>
+        <h1 class="text-3xl font-bold">AlonsoTrack</h1>
+        <p class="text-blue-100 mt-1">Historial de Mantenimiento</p>
       </div>
-      <form id="login-form" class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
-          <input type="text" id="login-user" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+      <div class="p-8">
+        <form id="login-form" class="space-y-5">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
+            <input type="text" id="login-user" autocomplete="username"
+              class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="Usuario" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+            <input type="password" id="login-pass" autocomplete="current-password"
+              class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="Contraseña" required>
+          </div>
+          <button type="submit"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-xl transition">
+            Ingresar
+          </button>
+        </form>
+        <div class="mt-6 pt-6 border-t text-center">
+          <button onclick="showClientLogin()" class="text-blue-600 hover:underline text-sm font-medium">
+            ¿Sos cliente? Consultá tu historial →
+          </button>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
-          <input type="password" id="login-pass" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <button type="submit" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-medium py-2.5 rounded-lg transition">Ingresar</button>
-      </form>
-      <div class="mt-6 pt-6 border-t text-center">
-        <button onclick="showClientAccess()" class="text-blue-600 hover:underline text-sm">¿Sos cliente? Consultá tu historial →</button>
       </div>
     </div>
   </div>
 
-  <!-- ACCESO CLIENTE -->
-  <div id="client-access-view" class="hidden min-h-screen flex items-center justify-center p-4">
-    <div class="card w-full max-w-md p-8">
-      <div class="text-center mb-8">
-        <h1 class="text-2xl font-bold text-blue-800">Consultar historial</h1>
-        <p class="text-gray-500 mt-1">Ingresá la placa y el código que te dio el taller</p>
-      </div>
+  <!-- CLIENT ACCESS -->
+  <div id="client-login" class="hidden min-h-screen flex items-center justify-center bg-gray-100 px-4">
+    <div class="bg-white rounded-3xl shadow-xl w-full max-w-md p-8">
+      <h2 class="text-2xl font-bold text-center mb-6">Acceso Cliente</h2>
       <form id="client-form" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Placa</label>
-          <input type="text" id="client-plate" placeholder="ABC123" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+          <label class="block text-sm font-medium mb-1">Patente</label>
+          <input type="text" id="client-plate" class="w-full border rounded-xl px-4 py-3 uppercase" placeholder="ABC123" required>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Código de acceso</label>
-          <input type="text" id="client-code" placeholder="XXXXXX" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+          <label class="block text-sm font-medium mb-1">Código de acceso</label>
+          <input type="text" id="client-code" class="w-full border rounded-xl px-4 py-3 uppercase" placeholder="Código" required>
         </div>
-        <button type="submit" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-medium py-2.5 rounded-lg">Ver historial</button>
+        <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold">Ver historial</button>
       </form>
-      <div class="mt-6 text-center">
-        <button onclick="showLogin()" class="text-gray-500 hover:underline text-sm">← Volver al login del taller</button>
-      </div>
+      <button onclick="showAdminLogin()" class="w-full mt-4 text-gray-500 text-sm">← Volver</button>
     </div>
   </div>
 
-  <!-- APP PRINCIPAL (ADMIN) -->
-  <div id="app-view" class="hidden">
-    <!-- Header -->
-    <header class="bg-blue-800 text-white sticky top-0 z-50 shadow">
+  <!-- MAIN APP -->
+  <div id="main-app" class="hidden min-h-screen">
+    <nav class="bg-white border-b shadow-sm sticky top-0 z-10">
       <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <h1 class="text-xl font-bold">AlonsoTrack</h1>
-          <span class="text-blue-200 text-sm hidden sm:inline">Taller de Santiago Alonso</span>
+          <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold">AT</div>
+          <div>
+            <h1 class="font-bold text-lg">AlonsoTrack</h1>
+            <p class="text-xs text-gray-500">Santiago Alonso</p>
+          </div>
         </div>
-        <div class="flex items-center gap-3">
-          <span id="admin-name" class="text-sm"></span>
-          <button onclick="logout()" class="text-sm bg-blue-700 hover:bg-blue-600 px-3 py-1.5 rounded">Salir</button>
-        </div>
-      </div>
-    </header>
-
-    <!-- Nav -->
-    <nav class="bg-white border-b sticky top-14 z-40">
-      <div class="max-w-6xl mx-auto px-4 flex gap-1 overflow-x-auto">
-        <button onclick="showSection('dashboard')" class="nav-btn px-4 py-3 text-sm font-medium border-b-2 border-blue-700 text-blue-700" data-section="dashboard">Inicio</button>
-        <button onclick="showSection('clients')" class="nav-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-blue-700" data-section="clients">Clientes</button>
-        <button onclick="showSection('vehicles')" class="nav-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-blue-700" data-section="vehicles">Vehículos</button>
+        <button onclick="logout()" class="text-sm px-4 py-2 border border-red-200 text-red-600 rounded-xl hover:bg-red-50">
+          Cerrar sesión
+        </button>
       </div>
     </nav>
 
-    <main class="max-w-6xl mx-auto px-4 py-6">
-      <!-- DASHBOARD -->
-      <section id="section-dashboard" class="space-y-6">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="card p-5">
+    <div class="max-w-6xl mx-auto px-4 py-6">
+      <!-- Tabs -->
+      <div class="flex gap-2 mb-6 overflow-x-auto">
+        <button onclick="showView('dashboard')" id="tab-dashboard" class="tab-btn px-5 py-2 rounded-xl font-medium bg-blue-600 text-white">Dashboard</button>
+        <button onclick="showView('clients')" id="tab-clients" class="tab-btn px-5 py-2 rounded-xl font-medium bg-white border">Clientes</button>
+        <button onclick="showView('vehicles')" id="tab-vehicles" class="tab-btn px-5 py-2 rounded-xl font-medium bg-white border">Vehículos</button>
+      </div>
+
+      <!-- Dashboard -->
+      <div id="view-dashboard" class="space-y-6">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-white rounded-2xl p-5 shadow-sm border">
             <p class="text-sm text-gray-500">Clientes</p>
-            <p id="stat-clients" class="text-3xl font-bold text-blue-800">0</p>
+            <p id="stat-clients" class="text-3xl font-bold text-blue-600">0</p>
           </div>
-          <div class="card p-5">
+          <div class="bg-white rounded-2xl p-5 shadow-sm border">
             <p class="text-sm text-gray-500">Vehículos</p>
-            <p id="stat-vehicles" class="text-3xl font-bold text-blue-800">0</p>
+            <p id="stat-vehicles" class="text-3xl font-bold text-blue-600">0</p>
           </div>
         </div>
-
-        <div class="grid md:grid-cols-2 gap-6">
-          <div class="card p-5">
-            <h2 class="font-semibold text-lg mb-4">Próximos mantenimientos</h2>
-            <div id="upcoming-list" class="space-y-3 text-sm"></div>
-          </div>
-          <div class="card p-5">
-            <h2 class="font-semibold text-lg mb-4">Últimos trabajos</h2>
-            <div id="recent-list" class="space-y-3 text-sm"></div>
-          </div>
+        <div class="bg-white rounded-2xl p-5 shadow-sm border">
+          <h3 class="font-semibold mb-4">Próximos mantenimientos</h3>
+          <div id="upcoming-list" class="space-y-3 text-sm"></div>
         </div>
-      </section>
+        <div class="bg-white rounded-2xl p-5 shadow-sm border">
+          <h3 class="font-semibold mb-4">Últimos trabajos</h3>
+          <div id="recent-list" class="space-y-3 text-sm"></div>
+        </div>
+      </div>
 
-      <!-- CLIENTES -->
-      <section id="section-clients" class="hidden space-y-4">
-        <div class="flex justify-between items-center">
+      <!-- Clients -->
+      <div id="view-clients" class="hidden">
+        <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-bold">Clientes</h2>
+          <button onclick="openClientModal()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium">+ Nuevo</button>
+        </div>
+        <div id="clients-list" class="space-y-3"></div>
+      </div>
+
+      <!-- Vehicles -->
+      <div id="view-vehicles" class="hidden">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold">Vehículos</h2>
+          <button onclick="openVehicleModal()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium">+ Nuevo</button>
+        </div>
+        <div id="vehicles-list" class="space-y-3"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENT VIEW -->
+  <div id="client-view" class="hidden min-h-screen bg-gray-50">
+    <div class="bg-blue-600 text-white p-6">
+      <h1 class="text-2xl font-bold" id="cv-plate"></h1>
+      <p id="cv-info" class="text-blue-100"></p>
+    </div>
+    <div class="p-4 max-w-2xl mx-auto">
+      <button onclick="exportClientPDF()" class="w-full bg-white border border-blue-600 text-blue-600 py-3 rounded-xl font-medium mb-4">
+        Exportar PDF
+      </button>
+      <div id="cv-maintenances" class="space-y-3"></div>
+      <button onclick="location.reload()" class="w-full mt-6 text-gray-500 text-sm">Cerrar</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script>
+    const API = '';
+    let token = localStorage.getItem('at_token') || '';
+    let clients = [], vehicles = [], currentClientData = null;
+
+    // Views
+    function showAdminLogin() {
+      document.getElementById('login-screen').classList.remove('hidden');
+      document.getElementById('client-login').classList.add('hidden');
+      document.getElementById('main-app').classList.add('hidden');
+      document.getElementById('client-view').classList.add('hidden');
+    }
+    function showClientLogin() {
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('client-login').classList.remove('hidden');
+    }
+    function showApp() {
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('client-login').classList.add('hidden');
+      document.getElementById('main-app').classList.remove('hidden');
+      loadDashboard();
+    }
+    function showView(name) {
+      ['dashboard','clients','vehicles'].forEach(v => {
+        document.getElementById('view-' + v).classList.toggle('hidden', v !== name);
+        document.getElementById('tab-' + v).className = v === name
+          ? 'tab-btn px-5 py-2 rounded-xl font-medium bg-blue-600 text-white'
+          : 'tab-btn px-5 py-2 rounded-xl font-medium bg-white border';
+      });
+      if (name === 'clients') loadClients();
+      if (name === 'vehicles') loadVehicles();
+    }
+
+    // Login
+    document.getElementById('login-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const user = document.getElementById('login-user').value.trim();
+      const pass = document.getElementById('login-pass').value;
+      try {
+        const res = await fetch(API + '/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: user, password: pass })
+        });
+        const data = await res.json();
+        if (!res.ok) return alert(data.error || 'Error al ingresar');
+        token = data.token;
+        localStorage.setItem('at_token', token);
+        showApp();
+      } catch (err) {
+        alert('Error de conexión. Esperá 30 segundos e intentá de nuevo.');
+      }
+    };
+
+    document.getElementById('client-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const plate = document.getElementById('client-plate').value.trim();
+      const code = document.getElementById('client-code').value.trim();
+      try {
+        const res = await fetch(API + '/api/client-access', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plate, code })
+        });
+        const data = await res.json();
+        if (!res.ok) return alert(data.error);
+        currentClientData = data;
+        document.getElementById('client-login').classList.add('hidden');
+        document.getElementById('client-view').classList.remove('hidden');
+        document.getElementById('cv-plate').textContent = data.vehicle.plate;
+        document.getElementById('cv-info').textContent = `${data.vehicle.brand} ${data.vehicle.model} · ${data.vehicle.client_name}`;
+        const list = document.getElementById('cv-maintenances');
+        list.innerHTML = data.maintenances.length ? data.maintenances.map(m => `
+          <div class="bg-white rounded-xl p-4 border">
+            <div class="flex justify-between">
+              <span class="font-medium">${m.type || 'Mantenimiento'}</span>
+              <span class="text-sm text-gray-500">${m.date}</span>
+            </div>
+            <p class="text-sm text-gray-600 mt-1">${m.description || ''}</p>
+            ${m.next_date ? `<p class="text-xs text-blue-600 mt-2">Próximo: ${m.next_date}</p>` : ''}
+          </div>
+        `).join('') : '<p class="text-center text-gray-500 py-8">Sin historial aún</p>';
+      } catch (err) {
+        alert('Error de conexión');
+      }
+    };
+
+    function logout() {
+      localStorage.removeItem('at_token');
+      token = '';
+      location.reload();
+    }
+
+    // API helper
+    async function api(path, options = {}) {
+      const res = await fetch(API + path, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+          ...(options.headers || {})
+        }
+      });
+      if (res.status === 401) { logout(); return; }
+      return res.json();
+    }
+
+    async function loadDashboard() {
+      const data = await api('/api/dashboard');
+      if (!data) return;
+      document.getElementById('stat-clients').textContent = data.totalClients;
+      document.getElementById('stat-vehicles').textContent = data.totalVehicles;
+      document.getElementById('upcoming-list').innerHTML = data.upcoming.length
+        ? data.upcoming.map(m => `<div class="flex justify-between py-2 border-b"><span>${m.plate} · ${m.client_name}</span><span class="text-blue-600">${m.next_date}</span></div>`).join('')
+        : '<p class="text-gray-400">No hay próximos mantenimientos</p>';
+      document.getElementById('recent-list').innerHTML = data.recent.length
+        ? data.recent.map(m => `<div class="flex justify-between py-2 border-b"><span>${m.plate} · ${m.type}</span><span class="text-gray-500">${m.date}</span></div>`).join('')
+        : '<p class="text-gray-400">Sin trabajos recientes</p>';
+    }
+
+    async function loadClients() {
+      clients = await api('/api/clients') || [];
+      document.getElementById('clients-list').innerHTML = clients.length
+        ? clients.map(c => `
+          <div class="bg-white rounded-xl p-4 border flex justify-between items-center">
+            <div>
+              <p class="font-medium">${c.name}</p>
+              <p class="text-sm text-gray-500">${c.phone || ''} ${c.email || ''}</p>
+            </div>
+            <button onclick="deleteClient('${c.id}')" class="text-red-500 text-sm">Eliminar</button>
+          </div>
+        `).join('')
+        : '<p class="text-center text-gray-400 py-8">No hay clientes</p>';
+    }
+
+    async function loadVehicles() {
+      vehicles = await api('/api/vehicles') || [];
+      document.getElementById('vehicles-list').innerHTML = vehicles.length
+        ? vehicles.map(v => `
+          <div class="bg-white rounded-xl p-4 border">
+            <div class="flex justify-between">
+              <div>
+                <p class="font-bold text-lg">${v.plate}</p>
+                <p class="text-sm text-gray-600">${v.brand} ${v.model} · ${v.client_name}</p>
+                <p class="text-xs text-blue-600 mt-1">Código: ${v.access_code}</p>
+              </div>
+              <button onclick="deleteVehicle('${v.id}')" class="text-red-500 text-sm">Eliminar</button>
+            </div>
+          </div>
+        `).join('')
+        : '<p class="text-center text-gray-400 py-8">No hay vehículos</p>';
+    }
+
+    function openClientModal() {
+      const name = prompt('Nombre del cliente:');
+      if (!name) return;
+      const phone = prompt('Teléfono (opcional):') || '';
+      api('/api/clients', { method: 'POST', body: JSON.stringify({ name, phone }) }).then(loadClients);
+    }
+
+    function openVehicleModal() {
+      if (!clients.length) return alert('Primero creá un cliente');
+      const clientList = clients.map((c, i) => `${i+1}. ${c.name}`).join('\n');
+      const idx = prompt('Elegí el número del cliente:\n' + clientList);
+      if (!idx) return;
+      const client = clients[parseInt(idx)-1];
+      if (!client) return alert('Número inválido');
+      const plate = prompt('Patente:');
+      if (!plate) return;
+      const brand = prompt('Marca:') || '';
+      const model = prompt('Modelo:') || '';
+      api('/api/vehicles', {
+        method: 'POST',
+        body: JSON.stringify({ client_id: client.id, plate, brand, model })
+      }).then(data => {
+        alert('Vehículo creado.\nCódigo de acceso: ' + data.access_code);
+        loadVehicles();
+      });
+    }
+
+    async function deleteClient(id) {
+      if (!confirm('¿Eliminar cliente?')) return;
+      await api('/api/clients/' + id, { method: 'DELETE' });
+      loadClients();
+    }
+    async function deleteVehicle(id) {
+      if (!confirm('¿Eliminar vehículo?')) return;
+      await api('/api/vehicles/' + id, { method: 'DELETE' });
+      loadVehicles();
+    }
+
+    function exportClientPDF() {
+      if (!currentClientData) return;
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(18);
+      doc.text('AlonsoTrack - Historial', 14, 20);
+      doc.setFontSize(12);
+      doc.text(`Patente: ${currentClientData.vehicle.plate}`, 14, 30);
+      doc.text(`Cliente: ${currentClientData.vehicle.client_name}`, 14, 37);
+      const rows = currentClientData.maintenances.map(m => [m.date, m.type || '', m.description || '', m.next_date || '']);
+      doc.autoTable({
+        startY: 45,
+        head: [['Fecha', 'Tipo', 'Descripción', 'Próximo']],
+        body: rows
+      });
+      doc.save(`historial_${currentClientData.vehicle.plate}.pdf`);
+    }
+
+    // Auto login if token exists
+    if (token) {
+      showApp();
+    }
+  </script>
+</body>
+</html>
