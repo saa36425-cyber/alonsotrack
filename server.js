@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
@@ -15,7 +15,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ========== BASE DE DATOS SIMPLE (JSON) ==========
 function loadDB() {
   if (!fs.existsSync(DB_FILE)) {
     const initial = {
@@ -39,9 +38,8 @@ function saveDB(db) {
 
 let db = loadDB();
 
-// ========== AUTH ==========
 function authAdmin(req, res, next) {
-const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
+  const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
   if (!token) return res.status(401).json({ error: 'No autorizado' });
   try {
     req.admin = jwt.verify(token, JWT_SECRET);
@@ -51,7 +49,6 @@ const token = req.headers.authorization ? req.headers.authorization.split(' ')[1
   }
 }
 
-// ========== LOGIN ==========
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
   if (username !== db.admin.username || !bcrypt.compareSync(password, db.admin.password)) {
@@ -61,7 +58,6 @@ app.post('/api/login', (req, res) => {
   res.json({ token, username });
 });
 
-// ========== CLIENTES ==========
 app.get('/api/clients', authAdmin, (req, res) => {
   res.json(db.clients);
 });
@@ -94,7 +90,6 @@ app.delete('/api/clients/:id', authAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
-// ========== VEHÍCULOS ==========
 app.get('/api/vehicles', authAdmin, (req, res) => {
   const list = db.vehicles.map(v => {
     const client = db.clients.find(c => c.id === v.client_id);
@@ -140,7 +135,6 @@ app.delete('/api/vehicles/:id', authAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
-// ========== MANTENIMIENTOS ==========
 app.get('/api/vehicles/:id/maintenances', authAdmin, (req, res) => {
   const list = db.maintenances
     .filter(m => m.vehicle_id === req.params.id)
@@ -163,13 +157,10 @@ app.post('/api/maintenances', authAdmin, (req, res) => {
     created_at: new Date().toISOString()
   };
   db.maintenances.push(m);
-
-  // Actualizar km del vehículo
   if (m.km) {
     const v = db.vehicles.find(v => v.id === m.vehicle_id);
     if (v) v.current_km = m.km;
   }
-
   saveDB(db);
   res.json({ id: m.id });
 });
@@ -180,7 +171,6 @@ app.delete('/api/maintenances/:id', authAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
-// ========== DASHBOARD ==========
 app.get('/api/dashboard', authAdmin, (req, res) => {
   const recent = db.maintenances
     .slice()
@@ -215,26 +205,21 @@ app.get('/api/dashboard', authAdmin, (req, res) => {
   });
 });
 
-// ========== ACCESO CLIENTE ==========
 app.post('/api/client-access', (req, res) => {
   const plate = (req.body.plate || '').toUpperCase();
   const code = (req.body.code || '').toUpperCase();
-
   const vehicle = db.vehicles.find(v => v.plate === plate && v.access_code === code);
   if (!vehicle) return res.status(401).json({ error: 'Placa o código incorrectos' });
-
   const client = db.clients.find(c => c.id === vehicle.client_id);
   const maintenances = db.maintenances
     .filter(m => m.vehicle_id === vehicle.id)
     .sort((a, b) => b.date.localeCompare(a.date));
-
   res.json({
     vehicle: { ...vehicle, client_name: client ? client.name : '', phone: client ? client.phone : '', email: client ? client.email : '' },
     maintenances
   });
 });
 
-// Ruta principal
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -245,5 +230,3 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log('  Puerto:', PORT);
   console.log('  Usuario: santiago');
   console.log('  Contraseña: alonso2026');
-  console.log('========================================\n');
-});
