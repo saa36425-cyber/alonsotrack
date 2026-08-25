@@ -329,20 +329,16 @@
     }
 
     // Modal Vehículo
+    // FIX: antes se esperaba (await) la respuesta de /api/clients ANTES
+    // de sacarle la clase "hidden" al modal. Si esa llamada tardaba o
+    // fallaba, el modal nunca se mostraba y el botón parecía no hacer nada.
+    // Ahora el modal se muestra de inmediato y los clientes se cargan
+    // en segundo plano.
     async function openVehicleModal(vehicle = null) {
-      const res = await api('/api/clients');
-      const clients = Array.isArray(res) ? res : [];
-      const select = document.getElementById('v-client');
-      if (select) {
-        select.innerHTML = '<option value="">-- Sin cliente --</option>' + 
-          clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-      }
-
       if (vehicle) {
         document.getElementById('modal-vehicle-title').innerText = 'Editar Vehículo';
         document.getElementById('v-id').value = vehicle.id;
         document.getElementById('v-plate').value = vehicle.plate || '';
-        document.getElementById('v-client').value = vehicle.client_id || '';
         document.getElementById('v-brand').value = vehicle.brand || '';
         document.getElementById('v-model').value = vehicle.model || '';
         document.getElementById('v-year').value = vehicle.year || '';
@@ -352,7 +348,19 @@
         document.getElementById('form-vehicle').reset();
         document.getElementById('v-id').value = '';
       }
+
+      // Mostrar el modal ya, sin esperar la carga de clientes
       document.getElementById('modal-vehicle').classList.remove('hidden');
+
+      // Cargar el combo de clientes en segundo plano
+      const res = await api('/api/clients');
+      const clients = Array.isArray(res) ? res : [];
+      const select = document.getElementById('v-client');
+      if (select) {
+        select.innerHTML = '<option value="">-- Sin cliente --</option>' +
+          clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        if (vehicle) select.value = vehicle.client_id || '';
+      }
     }
 
     async function saveVehicle(e) {
