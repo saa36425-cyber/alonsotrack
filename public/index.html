@@ -15,7 +15,7 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
 
-  <!-- LOGIN ADMIN -->
+  <!-- LOGIN -->
   <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-700 px-4">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
       <div class="bg-blue-600 text-white p-8 text-center">
@@ -44,7 +44,7 @@
     </div>
   </div>
 
-  <!-- CLIENT LOGIN (solo patente) -->
+  <!-- CLIENT LOGIN -->
   <div id="client-login" class="hidden min-h-screen flex items-center justify-center bg-gray-100 px-4">
     <div class="bg-white rounded-3xl shadow-xl w-full max-w-md p-8">
       <div class="text-center mb-6">
@@ -85,7 +85,6 @@
         <button onclick="showView('vehicles')" id="tab-vehicles" class="tab-btn px-5 py-2.5 rounded-xl font-medium bg-white border">Vehículos</button>
       </div>
 
-      <!-- DASHBOARD -->
       <div id="view-dashboard" class="space-y-6">
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-white rounded-2xl p-5 shadow-sm border">
@@ -107,7 +106,6 @@
         </div>
       </div>
 
-      <!-- CLIENTES -->
       <div id="view-clients" class="hidden">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-bold">Clientes</h2>
@@ -116,7 +114,6 @@
         <div id="clients-list" class="space-y-3"></div>
       </div>
 
-      <!-- VEHÍCULOS -->
       <div id="view-vehicles" class="hidden">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-bold">Vehículos</h2>
@@ -125,7 +122,6 @@
         <div id="vehicles-list" class="space-y-3"></div>
       </div>
 
-      <!-- MANTENIMIENTOS DE UN VEHÍCULO -->
       <div id="view-maintenances" class="hidden">
         <div class="flex items-center gap-3 mb-4">
           <button onclick="showView('vehicles')" class="text-blue-600 text-sm">← Volver</button>
@@ -155,7 +151,23 @@
   <script>
     const API = '';
     let token = localStorage.getItem('at_token') || '';
-    let clients = [], vehicles = [], currentClientData = null, currentVehicleId = null;
+    let clients = [], vehicles = [], currentClientData = null, currentVehicleId = null, currentPlate = '';
+
+    // Categorías predeterminadas de servicio
+    const SERVICE_TYPES = [
+      'Cambio de aceite y filtro',
+      'Frenos',
+      'Suspensión / Amortiguadores',
+      'Correa de distribución',
+      'Embrague',
+      'Batería / Sistema eléctrico',
+      'Neumáticos / Alineación / Balanceo',
+      'Aire acondicionado',
+      'Diagnóstico / Scanner',
+      'Refrigeración / Radiador',
+      'Escape',
+      'Otros'
+    ];
 
     function showAdminLogin() {
       document.getElementById('login-screen').classList.remove('hidden');
@@ -230,7 +242,8 @@
             <div class="bg-white rounded-xl p-4 border shadow-sm">
               <div class="flex justify-between"><span class="font-medium">${m.type || 'Mantenimiento'}</span><span class="text-sm text-gray-500">${m.date}</span></div>
               <p class="text-sm text-gray-600 mt-1">${m.description || ''}</p>
-              ${m.next_date ? `<p class="text-xs text-blue-600 mt-2 font-medium">Próximo: ${m.next_date}</p>` : ''}
+              ${m.km ? `<p class="text-xs text-gray-500 mt-1">Km: ${m.km}</p>` : ''}
+              ${m.next_date ? `<p class="text-xs text-blue-600 mt-1 font-medium">Próximo: ${m.next_date}</p>` : ''}
             </div>`).join('')
           : '<p class="text-center text-gray-500 py-10">Todavía no hay historial registrado</p>';
       } catch (err) {
@@ -302,6 +315,7 @@
 
     async function openMaintenances(vehicleId, plate) {
       currentVehicleId = vehicleId;
+      currentPlate = plate;
       document.getElementById('maint-title').textContent = 'Mantenimientos · ' + plate;
       showView('maintenances');
       const list = await api('/api/vehicles/' + vehicleId + '/maintenances') || [];
@@ -315,7 +329,10 @@
             <p class="text-sm text-gray-600 mt-1">${m.description || ''}</p>
             ${m.km ? `<p class="text-xs text-gray-500 mt-1">Km: ${m.km}</p>` : ''}
             ${m.next_date ? `<p class="text-xs text-blue-600 mt-1">Próximo: ${m.next_date}</p>` : ''}
-            <button onclick="deleteMaintenance('${m.id}')" class="text-red-500 text-xs mt-2">Eliminar</button>
+            <div class="flex gap-4 mt-3">
+              <button onclick='editMaintenance(${JSON.stringify(m)})' class="text-blue-600 text-sm font-medium">Editar</button>
+              <button onclick="deleteMaintenance('${m.id}')" class="text-red-500 text-sm">Eliminar</button>
+            </div>
           </div>`).join('')
         : '<p class="text-center text-gray-400 py-8">Todavía no hay mantenimientos</p>';
     }
@@ -342,29 +359,58 @@
         .then(() => { alert('Vehículo creado'); loadVehicles(); });
     }
 
-    function openMaintenanceModal() {
+    function openMaintenanceModal(existing = null) {
       if (!currentVehicleId) return;
-      const date = prompt('Fecha (AAAA-MM-DD):', new Date().toISOString().slice(0,10));
-      if (!date) return;
-      const type = prompt('Tipo de trabajo (ej: Cambio de aceite, Frenos, etc):') || '';
-      const description = prompt('Descripción / detalles:') || '';
-      const km = prompt('Kilometraje actual (opcional):') || null;
-      const next_date = prompt('Próximo mantenimiento (AAAA-MM-DD, opcional):') || null;
 
-      api('/api/maintenances', {
-        method: 'POST',
-        body: JSON.stringify({
-          vehicle_id: currentVehicleId,
-          date,
-          type,
-          description,
-          km: km ? Number(km) : null,
-          next_date
-        })
-      }).then(() => {
-        alert('Mantenimiento guardado');
-        openMaintenances(currentVehicleId, document.getElementById('maint-title').textContent.split('·')[1].trim());
-      });
+      // Elegir tipo de servicio
+      let typeList = SERVICE_TYPES.map((t, i) => `${i + 1}. ${t}`).join('\n');
+      let typeChoice = prompt('Elegí el tipo de servicio:\n\n' + typeList + '\n\nEscribí el número:', existing && existing.type ? '' : '1');
+      if (typeChoice === null) return;
+
+      let type = '';
+      const num = parseInt(typeChoice);
+      if (num >= 1 && num <= SERVICE_TYPES.length) {
+        type = SERVICE_TYPES[num - 1];
+        if (type === 'Otros') {
+          type = prompt('Escribí el tipo de servicio:') || 'Otros';
+        }
+      } else {
+        type = typeChoice || (existing ? existing.type : 'Otros');
+      }
+
+      const date = prompt('Fecha (AAAA-MM-DD):', existing ? existing.date : new Date().toISOString().slice(0,10));
+      if (!date) return;
+
+      const description = prompt('Descripción / detalles:', existing ? existing.description || '' : '') || '';
+      const km = prompt('Kilometraje:', existing && existing.km ? existing.km : '') || null;
+      const next_date = prompt('Próximo mantenimiento (AAAA-MM-DD):', existing ? existing.next_date || '' : '') || null;
+
+      const body = {
+        date,
+        type,
+        description,
+        km: km ? Number(km) : null,
+        next_date: next_date || null
+      };
+
+      if (existing) {
+        api('/api/maintenances/' + existing.id, { method: 'PUT', body: JSON.stringify(body) })
+          .then(() => {
+            alert('Mantenimiento actualizado');
+            openMaintenances(currentVehicleId, currentPlate);
+          });
+      } else {
+        body.vehicle_id = currentVehicleId;
+        api('/api/maintenances', { method: 'POST', body: JSON.stringify(body) })
+          .then(() => {
+            alert('Mantenimiento guardado');
+            openMaintenances(currentVehicleId, currentPlate);
+          });
+      }
+    }
+
+    function editMaintenance(m) {
+      openMaintenanceModal(m);
     }
 
     async function deleteClient(id) {
@@ -380,7 +426,7 @@
     async function deleteMaintenance(id) {
       if (!confirm('¿Eliminar este registro?')) return;
       await api('/api/maintenances/' + id, { method: 'DELETE' });
-      openMaintenances(currentVehicleId, document.getElementById('maint-title').textContent.split('·')[1].trim());
+      openMaintenances(currentVehicleId, currentPlate);
     }
 
     function exportClientPDF() {
@@ -392,8 +438,22 @@
       doc.setFontSize(11);
       doc.text(`Patente: ${currentClientData.vehicle.plate}`, 14, 30);
       doc.text(`Cliente: ${currentClientData.vehicle.client_name || '-'}`, 14, 37);
-      const rows = currentClientData.maintenances.map(m => [m.date, m.type || '', m.description || '', m.next_date || '-']);
-      doc.autoTable({ startY: 45, head: [['Fecha', 'Tipo', 'Descripción', 'Próximo']], body: rows });
+      doc.text(`Vehículo: ${currentClientData.vehicle.brand || ''} ${currentClientData.vehicle.model || ''}`, 14, 44);
+
+      const rows = currentClientData.maintenances.map(m => [
+        m.date || '',
+        m.type || '',
+        m.description || '',
+        m.km ? String(m.km) : '-',
+        m.next_date || '-'
+      ]);
+
+      doc.autoTable({
+        startY: 52,
+        head: [['Fecha', 'Tipo', 'Descripción', 'Km', 'Próximo']],
+        body: rows,
+        styles: { fontSize: 9 }
+      });
       doc.save(`historial_${currentClientData.vehicle.plate}.pdf`);
     }
 
