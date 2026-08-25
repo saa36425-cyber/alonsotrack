@@ -104,9 +104,9 @@ app.get('/api/vehicles', authAdmin, (req, res) => {
 
 app.post('/api/vehicles', authAdmin, (req, res) => {
   const plate = (req.body.plate || '').toUpperCase().trim();
-  if (!plate) return res.status(400).json({ error: 'La placa es obligatoria' });
+  if (!plate) return res.status(400).json({ error: 'La patente es obligatoria' });
   if (db.vehicles.some(v => v.plate === plate)) {
-    return res.status(400).json({ error: 'La placa ya existe' });
+    return res.status(400).json({ error: 'La patente ya existe' });
   }
   const vehicle = {
     id: uuidv4(),
@@ -117,12 +117,11 @@ app.post('/api/vehicles', authAdmin, (req, res) => {
     year: req.body.year || null,
     current_km: req.body.current_km || 0,
     color: req.body.color || '',
-    access_code: Math.random().toString(36).substring(2, 8).toUpperCase(),
     created_at: new Date().toISOString()
   };
   db.vehicles.push(vehicle);
   saveDB(db);
-  res.json({ id: vehicle.id, access_code: vehicle.access_code });
+  res.json({ id: vehicle.id });
 });
 
 app.put('/api/vehicles/:id', authAdmin, (req, res) => {
@@ -216,15 +215,19 @@ app.get('/api/dashboard', authAdmin, (req, res) => {
   });
 });
 
+// ACCESO CLIENTE - SOLO CON PATENTE
 app.post('/api/client-access', (req, res) => {
   const plate = (req.body.plate || '').toUpperCase().trim();
-  const code = (req.body.code || '').toUpperCase().trim();
-  const vehicle = db.vehicles.find(v => v.plate === plate && v.access_code === code);
-  if (!vehicle) return res.status(401).json({ error: 'Placa o código incorrectos' });
+  if (!plate) return res.status(400).json({ error: 'Ingresá la patente' });
+
+  const vehicle = db.vehicles.find(v => v.plate === plate);
+  if (!vehicle) return res.status(404).json({ error: 'No se encontró un vehículo con esa patente' });
+
   const client = db.clients.find(c => c.id === vehicle.client_id);
   const maintenances = db.maintenances
     .filter(m => m.vehicle_id === vehicle.id)
     .sort((a, b) => b.date.localeCompare(a.date));
+
   res.json({
     vehicle: {
       ...vehicle,
