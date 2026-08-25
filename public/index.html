@@ -3,497 +3,120 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Taller Mecánico</title>
+  <title>AlonsoTrack – Historial de Mantenimiento</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3097/3097180.png">
+  <meta name="theme-color" content="#1e40af">
   <style>
     body { font-family: system-ui, -apple-system, sans-serif; }
     .card { @apply bg-white rounded-xl shadow-sm border border-gray-100; }
-
-    /* Evita que los dispositivos móviles seleccionen texto al presionar elementos */
-    button, a, .cursor-pointer {
-      -webkit-user-select: none;
-      user-select: none;
-      -webkit-touch-callout: none;
-    }
   </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-  <div id="app" class="max-w-4xl mx-auto p-4 md:p-6 pb-24">
-    <!-- Encabezado -->
-    <header class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-gray-800">Taller Mecánico</h1>
-      <button type="button" onclick="logout()" class="text-sm text-red-600 hover:underline">Cerrar sesión</button>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- LOGIN ADMIN -->
+  <div id="login-view" class="min-h-screen flex items-center justify-center p-4">
+    <div class="card w-full max-w-md p-8">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-blue-800">AlonsoTrack</h1>
+        <p class="text-gray-500 mt-1">Historial de mantenimiento</p>
+      </div>
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
+          <input type="text" id="login-user" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+          <input type="password" id="login-pass" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <button type="submit" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-medium py-2.5 rounded-lg transition">Ingresar</button>
+      </form>
+      <div class="mt-6 pt-6 border-t text-center">
+        <button onclick="showClientAccess()" class="text-blue-600 hover:underline text-sm">¿Sos cliente? Consultá tu historial →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCESO CLIENTE -->
+  <div id="client-access-view" class="hidden min-h-screen flex items-center justify-center p-4">
+    <div class="card w-full max-w-md p-8">
+      <div class="text-center mb-8">
+        <h1 class="text-2xl font-bold text-blue-800">Consultar historial</h1>
+        <p class="text-gray-500 mt-1">Ingresá la placa y el código que te dio el taller</p>
+      </div>
+      <form id="client-form" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Placa</label>
+          <input type="text" id="client-plate" placeholder="ABC123" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Código de acceso</label>
+          <input type="text" id="client-code" placeholder="XXXXXX" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <button type="submit" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-medium py-2.5 rounded-lg">Ver historial</button>
+      </form>
+      <div class="mt-6 text-center">
+        <button onclick="showLogin()" class="text-gray-500 hover:underline text-sm">← Volver al login del taller</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP PRINCIPAL (ADMIN) -->
+  <div id="app-view" class="hidden">
+    <!-- Header -->
+    <header class="bg-blue-800 text-white sticky top-0 z-50 shadow">
+      <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <h1 class="text-xl font-bold">AlonsoTrack</h1>
+          <span class="text-blue-200 text-sm hidden sm:inline">Taller de Santiago Alonso</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="admin-name" class="text-sm"></span>
+          <button onclick="logout()" class="text-sm bg-blue-700 hover:bg-blue-600 px-3 py-1.5 rounded">Salir</button>
+        </div>
+      </div>
     </header>
 
-    <!-- Pestañas de navegación -->
-    <nav class="flex gap-2 mb-6 border-b border-gray-200">
-      <button type="button" onclick="switchTab('vehicles')" id="tab-vehicles" class="px-4 py-2 font-medium border-b-2 border-blue-600 text-blue-600">Vehículos</button>
-      <button type="button" onclick="switchTab('clients')" id="tab-clients" class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Clientes</button>
-      <button type="button" onclick="switchTab('services')" id="tab-services" class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Servicios</button>
+    <!-- Nav -->
+    <nav class="bg-white border-b sticky top-14 z-40">
+      <div class="max-w-6xl mx-auto px-4 flex gap-1 overflow-x-auto">
+        <button onclick="showSection('dashboard')" class="nav-btn px-4 py-3 text-sm font-medium border-b-2 border-blue-700 text-blue-700" data-section="dashboard">Inicio</button>
+        <button onclick="showSection('clients')" class="nav-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-blue-700" data-section="clients">Clientes</button>
+        <button onclick="showSection('vehicles')" class="nav-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-blue-700" data-section="vehicles">Vehículos</button>
+      </div>
     </nav>
 
-    <!-- Vista: Vehículos -->
-    <section id="sec-vehicles" class="space-y-4">
-      <div class="flex justify-between items-center gap-2">
-        <input type="text" id="search-input" placeholder="Buscar por patente, cliente, marca..." class="w-full md:w-64 px-3 py-2 border rounded-lg" onkeyup="filterVehicles()">
-        <button type="button" onclick="openVehicleModal()" class="shrink-0 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700">+ Nuevo Vehículo</button>
-      </div>
-      <div class="card overflow-hidden">
-        <div id="vehicles-list" class="divide-y divide-gray-100">
-          <!-- Se cargan dinámicamente -->
-        </div>
-      </div>
-    </section>
-
-    <!-- Vista: Clientes -->
-    <section id="sec-clients" class="hidden space-y-4">
-      <div class="flex justify-between items-center">
-        <h2 class="text-xl font-bold">Clientes</h2>
-        <button type="button" onclick="openClientModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700">+ Nuevo Cliente</button>
-      </div>
-      <div class="card overflow-hidden">
-        <div id="clients-list" class="divide-y divide-gray-100">
-          <!-- Se cargan dinámicamente -->
-        </div>
-      </div>
-    </section>
-
-    <!-- Vista: Servicios -->
-    <section id="sec-services" class="hidden space-y-4">
-      <div class="flex justify-between items-center">
-        <h2 class="text-xl font-bold">Catálogo de Servicios</h2>
-        <button type="button" onclick="openServiceModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700">+ Nuevo Servicio</button>
-      </div>
-      <div class="card overflow-hidden">
-        <div id="services-list" class="divide-y divide-gray-100">
-          <!-- Se cargan dinámicamente -->
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- Modal: Nuevo/Editar Vehículo -->
-  <div id="modal-vehicle" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4">
-      <h3 class="text-lg font-bold" id="modal-vehicle-title">Nuevo Vehículo</h3>
-      <form id="form-vehicle" onsubmit="saveVehicle(event)">
-        <input type="hidden" id="v-id">
-        <div class="space-y-3">
-          <div>
-            <label class="block text-sm font-medium">Patente</label>
-            <input type="text" id="v-plate" required class="w-full border rounded-lg px-3 py-2 uppercase">
+    <main class="max-w-6xl mx-auto px-4 py-6">
+      <!-- DASHBOARD -->
+      <section id="section-dashboard" class="space-y-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="card p-5">
+            <p class="text-sm text-gray-500">Clientes</p>
+            <p id="stat-clients" class="text-3xl font-bold text-blue-800">0</p>
           </div>
-          <div>
-            <label class="block text-sm font-medium">Cliente</label>
-            <select id="v-client" class="w-full border rounded-lg px-3 py-2"></select>
-          </div>
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-sm font-medium">Marca</label>
-              <input type="text" id="v-brand" class="w-full border rounded-lg px-3 py-2">
-            </div>
-            <div>
-              <label class="block text-sm font-medium">Modelo</label>
-              <input type="text" id="v-model" class="w-full border rounded-lg px-3 py-2">
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-sm font-medium">Año</label>
-              <input type="number" id="v-year" class="w-full border rounded-lg px-3 py-2">
-            </div>
-            <div>
-              <label class="block text-sm font-medium">Kilometraje</label>
-              <input type="number" id="v-km" class="w-full border rounded-lg px-3 py-2">
-            </div>
+          <div class="card p-5">
+            <p class="text-sm text-gray-500">Vehículos</p>
+            <p id="stat-vehicles" class="text-3xl font-bold text-blue-800">0</p>
           </div>
         </div>
-        <div class="flex justify-end gap-2 mt-6">
-          <button type="button" onclick="closeModal('modal-vehicle')" class="px-4 py-2 border rounded-lg">Cancelar</button>
-          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Guardar</button>
-        </div>
-      </form>
-    </div>
-  </div>
 
-  <!-- Modal: Cliente -->
-  <div id="modal-client" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4">
-      <h3 class="text-lg font-bold" id="modal-client-title">Nuevo Cliente</h3>
-      <form id="form-client" onsubmit="saveClient(event)">
-        <input type="hidden" id="c-id">
-        <div class="space-y-3">
-          <div>
-            <label class="block text-sm font-medium">Nombre Completo</label>
-            <input type="text" id="c-name" required class="w-full border rounded-lg px-3 py-2">
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="card p-5">
+            <h2 class="font-semibold text-lg mb-4">Próximos mantenimientos</h2>
+            <div id="upcoming-list" class="space-y-3 text-sm"></div>
           </div>
-          <div>
-            <label class="block text-sm font-medium">Teléfono</label>
-            <input type="text" id="c-phone" class="w-full border rounded-lg px-3 py-2">
-          </div>
-          <div>
-            <label class="block text-sm font-medium">Email</label>
-            <input type="email" id="c-email" class="w-full border rounded-lg px-3 py-2">
+          <div class="card p-5">
+            <h2 class="font-semibold text-lg mb-4">Últimos trabajos</h2>
+            <div id="recent-list" class="space-y-3 text-sm"></div>
           </div>
         </div>
-        <div class="flex justify-end gap-2 mt-6">
-          <button type="button" onclick="closeModal('modal-client')" class="px-4 py-2 border rounded-lg">Cancelar</button>
-          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Guardar</button>
-        </div>
-      </form>
-    </div>
-  </div>
+      </section>
 
-  <!-- Modal: Detalle del Vehículo -->
-  <div id="modal-detail" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 overflow-y-auto z-50">
-    <div class="bg-white rounded-xl max-w-2xl w-full p-6 space-y-6 my-8">
-      <div class="flex justify-between items-start border-b pb-4">
-        <div>
-          <h2 class="text-2xl font-bold" id="detail-plate">---</h2>
-          <p class="text-gray-600" id="detail-subtitle">---</p>
-        </div>
-        <button type="button" onclick="closeModal('modal-detail')" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
-      </div>
-
-      <!-- Ficha de mantenimiento rápido -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-lg">
-        <div>
-          <span class="text-xs text-gray-500 uppercase font-medium">Aceite Motor</span>
-          <p class="font-semibold text-gray-800" id="status-oil">--</p>
-        </div>
-        <div>
-          <span class="text-xs text-gray-500 uppercase font-medium">Filtro Aire</span>
-          <p class="font-semibold text-gray-800" id="status-filter-air">--</p>
-        </div>
-        <div>
-          <span class="text-xs text-gray-500 uppercase font-medium">Filtro Nafta/Diésel</span>
-          <p class="font-semibold text-gray-800" id="status-filter-fuel">--</p>
-        </div>
-        <div>
-          <span class="text-xs text-gray-500 uppercase font-medium">Correa Distribución</span>
-          <p class="font-semibold text-gray-800" id="status-belt">--</p>
-        </div>
-      </div>
-
-      <!-- Registrar Trabajo -->
-      <div class="border-t pt-4">
-        <h4 class="font-bold mb-3">Registrar Nuevo Trabajo</h4>
-        <form id="form-work" onsubmit="saveWork(event)" class="space-y-3">
-          <input type="hidden" id="w-vehicle-id">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-medium text-gray-600">Servicio</label>
-              <select id="w-service" class="w-full border rounded-lg px-3 py-2 text-sm" required></select>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-gray-600">Km Actuales</label>
-              <input type="number" id="w-km" class="w-full border rounded-lg px-3 py-2 text-sm" required>
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-600">Detalles/Observaciones</label>
-            <input type="text" id="w-notes" placeholder="Ej: Cambio de aceite 10w40 y filtro" class="w-full border rounded-lg px-3 py-2 text-sm">
-          </div>
-          <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg font-medium text-sm hover:bg-green-700">+ Guardar Registro</button>
-        </form>
-      </div>
-
-      <!-- Historial -->
-      <div class="border-t pt-4">
-        <h4 class="font-bold mb-3">Historial de Servicios</h4>
-        <div id="work-history" class="space-y-3 max-h-60 overflow-y-auto pr-2">
-          <!-- Carga dinámica -->
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    let allVehicles = [];
-
-    // Helper API con manejo de respuestas seguras
-    async function api(url, options = {}) {
-      try {
-        const res = await fetch(url, {
-          headers: { 'Content-Type': 'application/json' },
-          ...options
-        });
-        if (res.status === 401) {
-          window.location.href = '/login.html';
-          return null;
-        }
-        return await res.json();
-      } catch (err) {
-        console.error("Error al conectar con la API:", err);
-        return null;
-      }
-    }
-
-    // Navegación entre pestañas
-    function switchTab(tab) {
-      ['vehicles', 'clients', 'services'].forEach(t => {
-        const sec = document.getElementById(`sec-${t}`);
-        const tabBtn = document.getElementById(`tab-${t}`);
-        if (sec) sec.classList.add('hidden');
-        if (tabBtn) tabBtn.className = 'px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700';
-      });
-
-      const activeSec = document.getElementById(`sec-${tab}`);
-      const activeTabBtn = document.getElementById(`tab-${tab}`);
-      if (activeSec) activeSec.classList.remove('hidden');
-      if (activeTabBtn) activeTabBtn.className = 'px-4 py-2 font-medium border-b-2 border-blue-600 text-blue-600';
-      
-      if (tab === 'vehicles') loadVehicles();
-      if (tab === 'clients') loadClients();
-      if (tab === 'services') loadServices();
-    }
-
-    // Cargar Vehículos
-    async function loadVehicles() {
-      const res = await api('/api/vehicles');
-      allVehicles = Array.isArray(res) ? res : (res && res.vehicles && Array.isArray(res.vehicles) ? res.vehicles : []);
-      renderVehicles(allVehicles);
-    }
-
-    // Renderizado táctil optimizado para móviles (usa elementos <button>)
-    function renderVehicles(list) {
-      const container = document.getElementById('vehicles-list');
-      if (!container) return;
-
-      if (!Array.isArray(list) || list.length === 0) {
-        container.innerHTML = '<p class="p-4 text-gray-400">No hay vehículos</p>';
-        return;
-      }
-
-      container.innerHTML = list.map(v => `
-        <button type="button" class="w-full text-left p-4 flex justify-between items-center hover:bg-gray-50 active:bg-gray-100 transition-colors border-b last:border-0" onclick="openVehicleDetail(${v.id})">
-          <div>
-            <p class="font-medium text-lg text-gray-900">${v.plate || ''}</p>
-            <p class="text-sm text-gray-600">${v.brand || ''} ${v.model || ''} ${v.year || ''}</p>
-            <p class="text-xs text-gray-400">${v.client_name || 'Sin cliente'} · ${v.current_km || 0} km</p>
-          </div>
-          <span class="text-blue-600 text-sm font-medium pointer-events-none">Ver →</span>
-        </button>
-      `).join('');
-    }
-
-    function filterVehicles() {
-      const input = document.getElementById('search-input');
-      if (!input || !Array.isArray(allVehicles)) return;
-      const q = input.value.toLowerCase();
-      const filtered = allVehicles.filter(v => 
-        (v.plate && v.plate.toLowerCase().includes(q)) ||
-        (v.brand && v.brand.toLowerCase().includes(q)) ||
-        (v.model && v.model.toLowerCase().includes(q)) ||
-        (v.client_name && v.client_name.toLowerCase().includes(q))
-      );
-      renderVehicles(filtered);
-    }
-
-    // Cargar Clientes
-    async function loadClients() {
-      const res = await api('/api/clients');
-      const clients = Array.isArray(res) ? res : [];
-      const container = document.getElementById('clients-list');
-      if (!container) return;
-
-      container.innerHTML = clients.length ? clients.map(c => `
-        <div class="p-4 flex justify-between items-center border-b last:border-0">
-          <div>
-            <p class="font-medium text-gray-900">${c.name || ''}</p>
-            <p class="text-sm text-gray-500">${c.phone || ''} ${c.email ? '· ' + c.email : ''}</p>
-          </div>
-          <div class="flex gap-2">
-            <button type="button" onclick='editClient(${JSON.stringify(c)})' class="text-blue-600 text-sm p-2 hover:underline">Editar</button>
-            <button type="button" onclick="deleteClient(${c.id})" class="text-red-500 text-sm p-2 hover:underline">Eliminar</button>
-          </div>
-        </div>
-      `).join('') : '<p class="p-4 text-gray-400">No hay clientes</p>';
-    }
-
-    // Cargar Servicios
-    async function loadServices() {
-      const res = await api('/api/services');
-      const services = Array.isArray(res) ? res : [];
-      const container = document.getElementById('services-list');
-      if (!container) return;
-
-      container.innerHTML = services.length ? services.map(s => `
-        <div class="p-4 flex justify-between items-center border-b last:border-0">
-          <div>
-            <p class="font-medium text-gray-900">${s.name || ''}</p>
-            <p class="text-xs text-gray-400">Intervalo recomendado: ${s.interval_km ? s.interval_km + ' km' : 'No definido'}</p>
-          </div>
-        </div>
-      `).join('') : '<p class="p-4 text-gray-400">No hay servicios registrados</p>';
-    }
-
-    // Modal Vehículo
-    // FIX: antes se esperaba (await) la respuesta de /api/clients ANTES
-    // de sacarle la clase "hidden" al modal. Si esa llamada tardaba o
-    // fallaba, el modal nunca se mostraba y el botón parecía no hacer nada.
-    // Ahora el modal se muestra de inmediato y los clientes se cargan
-    // en segundo plano.
-    async function openVehicleModal(vehicle = null) {
-      if (vehicle) {
-        document.getElementById('modal-vehicle-title').innerText = 'Editar Vehículo';
-        document.getElementById('v-id').value = vehicle.id;
-        document.getElementById('v-plate').value = vehicle.plate || '';
-        document.getElementById('v-brand').value = vehicle.brand || '';
-        document.getElementById('v-model').value = vehicle.model || '';
-        document.getElementById('v-year').value = vehicle.year || '';
-        document.getElementById('v-km').value = vehicle.current_km || '';
-      } else {
-        document.getElementById('modal-vehicle-title').innerText = 'Nuevo Vehículo';
-        document.getElementById('form-vehicle').reset();
-        document.getElementById('v-id').value = '';
-      }
-
-      // Mostrar el modal ya, sin esperar la carga de clientes
-      document.getElementById('modal-vehicle').classList.remove('hidden');
-
-      // Cargar el combo de clientes en segundo plano
-      const res = await api('/api/clients');
-      const clients = Array.isArray(res) ? res : [];
-      const select = document.getElementById('v-client');
-      if (select) {
-        select.innerHTML = '<option value="">-- Sin cliente --</option>' +
-          clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-        if (vehicle) select.value = vehicle.client_id || '';
-      }
-    }
-
-    async function saveVehicle(e) {
-      e.preventDefault();
-      const id = document.getElementById('v-id').value;
-      const data = {
-        plate: document.getElementById('v-plate').value.toUpperCase(),
-        client_id: document.getElementById('v-client').value || null,
-        brand: document.getElementById('v-brand').value,
-        model: document.getElementById('v-model').value,
-        year: document.getElementById('v-year').value,
-        current_km: document.getElementById('v-km').value
-      };
-
-      await api(id ? `/api/vehicles/${id}` : '/api/vehicles', {
-        method: id ? 'PUT' : 'POST',
-        body: JSON.stringify(data)
-      });
-
-      closeModal('modal-vehicle');
-      loadVehicles();
-    }
-
-    // Modal Cliente
-    function openClientModal() {
-      document.getElementById('modal-client-title').innerText = 'Nuevo Cliente';
-      document.getElementById('form-client').reset();
-      document.getElementById('c-id').value = '';
-      document.getElementById('modal-client').classList.remove('hidden');
-    }
-
-    async function saveClient(e) {
-      e.preventDefault();
-      const id = document.getElementById('c-id').value;
-      const data = {
-        name: document.getElementById('c-name').value,
-        phone: document.getElementById('c-phone').value,
-        email: document.getElementById('c-email').value
-      };
-
-      await api(id ? `/api/clients/${id}` : '/api/clients', {
-        method: id ? 'PUT' : 'POST',
-        body: JSON.stringify(data)
-      });
-
-      closeModal('modal-client');
-      loadClients();
-    }
-
-    // Abrir Detalle de Vehículo
-    async function openVehicleDetail(id) {
-      const data = await api(`/api/vehicles/${id}/detail`);
-      if (!data || !data.vehicle) return;
-      const v = data.vehicle;
-      
-      document.getElementById('detail-plate').innerText = v.plate || '';
-      document.getElementById('detail-subtitle').innerText = `${v.brand || ''} ${v.model || ''} · ${v.client_name || 'Sin Cliente'}`;
-      document.getElementById('w-vehicle-id').value = v.id;
-      document.getElementById('w-km').value = v.current_km || '';
-
-      // Estados de mantenimiento
-      const statusMap = { oil: 'status-oil', air: 'status-filter-air', fuel: 'status-filter-fuel', belt: 'status-belt' };
-      Object.keys(statusMap).forEach(k => {
-        const el = document.getElementById(statusMap[k]);
-        if (el) {
-          if (data.status && data.status[k]) {
-            el.innerText = `${data.status[k].last_km} km`;
-            el.className = data.status[k].alert ? 'font-semibold text-red-600' : 'font-semibold text-green-600';
-          } else {
-            el.innerText = 'Sin registro';
-            el.className = 'font-semibold text-gray-400';
-          }
-        }
-      });
-
-      // Cargar lista de servicios en el select del modal
-      const resServ = await api('/api/services');
-      const services = Array.isArray(resServ) ? resServ : [];
-      const wServiceSelect = document.getElementById('w-service');
-      if (wServiceSelect) {
-        wServiceSelect.innerHTML = services.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-      }
-
-      // Render Historial
-      const historyEl = document.getElementById('work-history');
-      if (historyEl) {
-        const history = Array.isArray(data.history) ? data.history : [];
-        historyEl.innerHTML = history.length ? history.map(h => `
-          <div class="bg-gray-50 p-3 rounded-lg flex justify-between items-center text-sm border border-gray-100">
-            <div>
-              <p class="font-medium text-gray-900">${h.service_name || ''}</p>
-              <p class="text-xs text-gray-500">${h.notes || 'Sin observaciones'}</p>
-              <span class="text-xs text-gray-400">${h.date ? new Date(h.date).toLocaleDateString() : ''}</span>
-            </div>
-            <span class="font-bold text-gray-700">${h.km || 0} km</span>
-          </div>
-        `).join('') : '<p class="text-gray-400 text-sm">No hay trabajos registrados.</p>';
-      }
-
-      document.getElementById('modal-detail').classList.remove('hidden');
-    }
-
-    async function saveWork(e) {
-      e.preventDefault();
-      const vehicleId = document.getElementById('w-vehicle-id').value;
-      const data = {
-        vehicle_id: vehicleId,
-        service_id: document.getElementById('w-service').value,
-        km: document.getElementById('w-km').value,
-        notes: document.getElementById('w-notes').value
-      };
-
-      await api('/api/works', { method: 'POST', body: JSON.stringify(data) });
-      document.getElementById('w-notes').value = '';
-      openVehicleDetail(vehicleId);
-      loadVehicles();
-    }
-
-    // Cierre de Modales
-    function closeModal(id) {
-      const modal = document.getElementById(id);
-      if (modal) modal.classList.add('hidden');
-    }
-
-    async function logout() {
-      await api('/api/logout', { method: 'POST' });
-      window.location.href = '/login.html';
-    }
-
-    // Inicializar app
-    document.addEventListener('DOMContentLoaded', () => {
-      loadVehicles();
-    });
-  </script>
-</body>
-</html>
+      <!-- CLIENTES -->
+      <section id="section-clients" class="hidden space-y-4">
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-bold">Clientes</h2>
