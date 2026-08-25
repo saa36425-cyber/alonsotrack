@@ -29,31 +29,22 @@
         <form id="login-form" class="space-y-5">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
-            <input type="text" id="login-user" autocomplete="username"
-              class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none"
-              placeholder="Usuario" required>
+            <input type="text" id="login-user" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Usuario" required>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
-            <input type="password" id="login-pass" autocomplete="current-password"
-              class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none"
-              placeholder="Contraseña" required>
+            <input type="password" id="login-pass" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Contraseña" required>
           </div>
-          <button type="submit"
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-xl transition">
-            Ingresar
-          </button>
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-xl">Ingresar</button>
         </form>
         <div class="mt-6 pt-6 border-t text-center">
-          <button onclick="showClientLogin()" class="text-blue-600 hover:underline text-sm font-medium">
-            ¿Sos cliente? Consultá tu historial →
-          </button>
+          <button onclick="showClientLogin()" class="text-blue-600 hover:underline text-sm font-medium">¿Sos cliente? Consultá tu historial →</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- CLIENT ACCESS (solo patente) -->
+  <!-- CLIENT LOGIN (solo patente) -->
   <div id="client-login" class="hidden min-h-screen flex items-center justify-center bg-gray-100 px-4">
     <div class="bg-white rounded-3xl shadow-xl w-full max-w-md p-8">
       <div class="text-center mb-6">
@@ -64,23 +55,17 @@
       <form id="client-form" class="space-y-4">
         <div>
           <label class="block text-sm font-medium mb-1">Patente</label>
-          <input type="text" id="client-plate" 
-            class="w-full border border-gray-300 rounded-xl px-4 py-3 uppercase text-lg tracking-wider focus:ring-2 focus:ring-blue-500 outline-none" 
-            placeholder="ABC123" required>
+          <input type="text" id="client-plate" class="w-full border border-gray-300 rounded-xl px-4 py-3 uppercase text-lg tracking-wider focus:ring-2 focus:ring-blue-500 outline-none" placeholder="ABC123" required>
         </div>
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-semibold transition">
-          Ver historial
-        </button>
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-semibold">Ver historial</button>
       </form>
-      <button onclick="showAdminLogin()" class="w-full mt-5 text-gray-500 text-sm hover:underline">
-        ← Volver al inicio
-      </button>
+      <button onclick="showAdminLogin()" class="w-full mt-5 text-gray-500 text-sm hover:underline">← Volver al inicio</button>
     </div>
   </div>
 
-  <!-- MAIN APP (ADMIN) -->
+  <!-- MAIN APP -->
   <div id="main-app" class="hidden min-h-screen">
-    <nav class="bg-white border-b shadow-sm sticky top-0 z-10">
+    <nav class="bg-white border-b shadow-sm sticky top-0 z-20">
       <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold">AT</div>
@@ -89,20 +74,18 @@
             <p class="text-xs text-gray-500">Santiago Alonso</p>
           </div>
         </div>
-        <button onclick="logout()" class="text-sm px-4 py-2 border border-red-200 text-red-600 rounded-xl hover:bg-red-50">
-          Cerrar sesión
-        </button>
+        <button onclick="logout()" class="text-sm px-4 py-2 border border-red-200 text-red-600 rounded-xl hover:bg-red-50">Cerrar sesión</button>
       </div>
     </nav>
 
     <div class="max-w-6xl mx-auto px-4 py-6">
-      <div class="flex gap-2 mb-6 overflow-x-auto pb-1">
-        <button onclick="showView('dashboard')" id="tab-dashboard" class="tab-btn px-5 py-2.5 rounded-xl font-medium bg-blue-600 text-white whitespace-nowrap">Dashboard</button>
-        <button onclick="showView('clients')" id="tab-clients" class="tab-btn px-5 py-2.5 rounded-xl font-medium bg-white border whitespace-nowrap">Clientes</button>
-        <button onclick="showView('vehicles')" id="tab-vehicles" class="tab-btn px-5 py-2.5 rounded-xl font-medium bg-white border whitespace-nowrap">Vehículos</button>
+      <div class="flex gap-2 mb-6 overflow-x-auto">
+        <button onclick="showView('dashboard')" id="tab-dashboard" class="tab-btn px-5 py-2.5 rounded-xl font-medium bg-blue-600 text-white">Dashboard</button>
+        <button onclick="showView('clients')" id="tab-clients" class="tab-btn px-5 py-2.5 rounded-xl font-medium bg-white border">Clientes</button>
+        <button onclick="showView('vehicles')" id="tab-vehicles" class="tab-btn px-5 py-2.5 rounded-xl font-medium bg-white border">Vehículos</button>
       </div>
 
-      <!-- Dashboard -->
+      <!-- DASHBOARD -->
       <div id="view-dashboard" class="space-y-6">
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-white rounded-2xl p-5 shadow-sm border">
@@ -124,7 +107,7 @@
         </div>
       </div>
 
-      <!-- Clients -->
+      <!-- CLIENTES -->
       <div id="view-clients" class="hidden">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-bold">Clientes</h2>
@@ -133,13 +116,23 @@
         <div id="clients-list" class="space-y-3"></div>
       </div>
 
-      <!-- Vehicles -->
+      <!-- VEHÍCULOS -->
       <div id="view-vehicles" class="hidden">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-bold">Vehículos</h2>
           <button onclick="openVehicleModal()" class="bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium">+ Nuevo</button>
         </div>
         <div id="vehicles-list" class="space-y-3"></div>
+      </div>
+
+      <!-- MANTENIMIENTOS DE UN VEHÍCULO -->
+      <div id="view-maintenances" class="hidden">
+        <div class="flex items-center gap-3 mb-4">
+          <button onclick="showView('vehicles')" class="text-blue-600 text-sm">← Volver</button>
+          <h2 class="text-xl font-bold" id="maint-title">Mantenimientos</h2>
+        </div>
+        <button onclick="openMaintenanceModal()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-medium mb-4">+ Agregar mantenimiento</button>
+        <div id="maintenances-list" class="space-y-3"></div>
       </div>
     </div>
   </div>
@@ -151,13 +144,9 @@
       <p id="cv-info" class="text-blue-100 mt-1"></p>
     </div>
     <div class="p-4 max-w-2xl mx-auto">
-      <button onclick="exportClientPDF()" class="w-full bg-white border-2 border-blue-600 text-blue-600 py-3.5 rounded-xl font-semibold mb-5">
-        Descargar PDF del historial
-      </button>
+      <button onclick="exportClientPDF()" class="w-full bg-white border-2 border-blue-600 text-blue-600 py-3.5 rounded-xl font-semibold mb-5">Descargar PDF del historial</button>
       <div id="cv-maintenances" class="space-y-3"></div>
-      <button onclick="location.reload()" class="w-full mt-8 text-gray-500 text-sm hover:underline">
-        Cerrar
-      </button>
+      <button onclick="location.reload()" class="w-full mt-8 text-gray-500 text-sm">Cerrar</button>
     </div>
   </div>
 
@@ -166,7 +155,7 @@
   <script>
     const API = '';
     let token = localStorage.getItem('at_token') || '';
-    let clients = [], vehicles = [], currentClientData = null;
+    let clients = [], vehicles = [], currentClientData = null, currentVehicleId = null;
 
     function showAdminLogin() {
       document.getElementById('login-screen').classList.remove('hidden');
@@ -185,11 +174,15 @@
       loadDashboard();
     }
     function showView(name) {
+      ['dashboard','clients','vehicles','maintenances'].forEach(v => {
+        const el = document.getElementById('view-' + v);
+        if (el) el.classList.toggle('hidden', v !== name);
+      });
       ['dashboard','clients','vehicles'].forEach(v => {
-        document.getElementById('view-' + v).classList.toggle('hidden', v !== name);
-        document.getElementById('tab-' + v).className = v === name
-          ? 'tab-btn px-5 py-2.5 rounded-xl font-medium bg-blue-600 text-white whitespace-nowrap'
-          : 'tab-btn px-5 py-2.5 rounded-xl font-medium bg-white border whitespace-nowrap';
+        const tab = document.getElementById('tab-' + v);
+        if (tab) tab.className = v === name
+          ? 'tab-btn px-5 py-2.5 rounded-xl font-medium bg-blue-600 text-white'
+          : 'tab-btn px-5 py-2.5 rounded-xl font-medium bg-white border';
       });
       if (name === 'clients') loadClients();
       if (name === 'vehicles') loadVehicles();
@@ -197,13 +190,14 @@
 
     document.getElementById('login-form').onsubmit = async (e) => {
       e.preventDefault();
-      const user = document.getElementById('login-user').value.trim();
-      const pass = document.getElementById('login-pass').value;
       try {
         const res = await fetch(API + '/api/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: user, password: pass })
+          body: JSON.stringify({
+            username: document.getElementById('login-user').value.trim(),
+            password: document.getElementById('login-pass').value
+          })
         });
         const data = await res.json();
         if (!res.ok) return alert(data.error || 'Error al ingresar');
@@ -211,7 +205,7 @@
         localStorage.setItem('at_token', token);
         showApp();
       } catch (err) {
-        alert('Error de conexión. La app puede estar despertando (esperá 40 segundos e intentá de nuevo).');
+        alert('Error de conexión. Esperá 40 segundos e intentá de nuevo.');
       }
     };
 
@@ -231,19 +225,16 @@
         document.getElementById('client-view').classList.remove('hidden');
         document.getElementById('cv-plate').textContent = data.vehicle.plate;
         document.getElementById('cv-info').textContent = `${data.vehicle.brand || ''} ${data.vehicle.model || ''} · ${data.vehicle.client_name || ''}`.trim();
-        const list = document.getElementById('cv-maintenances');
-        list.innerHTML = data.maintenances.length ? data.maintenances.map(m => `
-          <div class="bg-white rounded-xl p-4 border shadow-sm">
-            <div class="flex justify-between items-start">
-              <span class="font-medium">${m.type || 'Mantenimiento'}</span>
-              <span class="text-sm text-gray-500">${m.date}</span>
-            </div>
-            <p class="text-sm text-gray-600 mt-1">${m.description || ''}</p>
-            ${m.next_date ? `<p class="text-xs text-blue-600 mt-2 font-medium">Próximo: ${m.next_date}</p>` : ''}
-          </div>
-        `).join('') : '<p class="text-center text-gray-500 py-10">Todavía no hay historial registrado</p>';
+        document.getElementById('cv-maintenances').innerHTML = data.maintenances.length
+          ? data.maintenances.map(m => `
+            <div class="bg-white rounded-xl p-4 border shadow-sm">
+              <div class="flex justify-between"><span class="font-medium">${m.type || 'Mantenimiento'}</span><span class="text-sm text-gray-500">${m.date}</span></div>
+              <p class="text-sm text-gray-600 mt-1">${m.description || ''}</p>
+              ${m.next_date ? `<p class="text-xs text-blue-600 mt-2 font-medium">Próximo: ${m.next_date}</p>` : ''}
+            </div>`).join('')
+          : '<p class="text-center text-gray-500 py-10">Todavía no hay historial registrado</p>';
       } catch (err) {
-        alert('Error de conexión. Intentá de nuevo en unos segundos.');
+        alert('Error de conexión');
       }
     };
 
@@ -272,10 +263,10 @@
       document.getElementById('stat-clients').textContent = data.totalClients;
       document.getElementById('stat-vehicles').textContent = data.totalVehicles;
       document.getElementById('upcoming-list').innerHTML = data.upcoming.length
-        ? data.upcoming.map(m => `<div class="flex justify-between py-2.5 border-b last:border-0"><span>${m.plate} · ${m.client_name}</span><span class="text-blue-600 font-medium">${m.next_date}</span></div>`).join('')
+        ? data.upcoming.map(m => `<div class="flex justify-between py-2.5 border-b"><span>${m.plate} · ${m.client_name}</span><span class="text-blue-600 font-medium">${m.next_date}</span></div>`).join('')
         : '<p class="text-gray-400">No hay próximos mantenimientos</p>';
       document.getElementById('recent-list').innerHTML = data.recent.length
-        ? data.recent.map(m => `<div class="flex justify-between py-2.5 border-b last:border-0"><span>${m.plate} · ${m.type || 'Trabajo'}</span><span class="text-gray-500">${m.date}</span></div>`).join('')
+        ? data.recent.map(m => `<div class="flex justify-between py-2.5 border-b"><span>${m.plate} · ${m.type || 'Trabajo'}</span><span class="text-gray-500">${m.date}</span></div>`).join('')
         : '<p class="text-gray-400">Sin trabajos recientes</p>';
     }
 
@@ -284,14 +275,10 @@
       document.getElementById('clients-list').innerHTML = clients.length
         ? clients.map(c => `
           <div class="bg-white rounded-xl p-4 border flex justify-between items-center">
-            <div>
-              <p class="font-medium">${c.name}</p>
-              <p class="text-sm text-gray-500">${c.phone || ''} ${c.email || ''}</p>
-            </div>
-            <button onclick="deleteClient('${c.id}')" class="text-red-500 text-sm hover:underline">Eliminar</button>
-          </div>
-        `).join('')
-        : '<p class="text-center text-gray-400 py-10">No hay clientes todavía</p>';
+            <div><p class="font-medium">${c.name}</p><p class="text-sm text-gray-500">${c.phone || ''}</p></div>
+            <button onclick="deleteClient('${c.id}')" class="text-red-500 text-sm">Eliminar</button>
+          </div>`).join('')
+        : '<p class="text-center text-gray-400 py-10">No hay clientes</p>';
     }
 
     async function loadVehicles() {
@@ -304,73 +291,109 @@
                 <p class="font-bold text-lg">${v.plate}</p>
                 <p class="text-sm text-gray-600">${v.brand || ''} ${v.model || ''} · ${v.client_name || ''}</p>
               </div>
-              <button onclick="deleteVehicle('${v.id}')" class="text-red-500 text-sm hover:underline">Eliminar</button>
+              <div class="flex gap-3">
+                <button onclick="openMaintenances('${v.id}', '${v.plate}')" class="text-blue-600 text-sm font-medium">Mantenimientos</button>
+                <button onclick="deleteVehicle('${v.id}')" class="text-red-500 text-sm">Eliminar</button>
+              </div>
             </div>
-          </div>
-        `).join('')
-        : '<p class="text-center text-gray-400 py-10">No hay vehículos todavía</p>';
+          </div>`).join('')
+        : '<p class="text-center text-gray-400 py-10">No hay vehículos</p>';
+    }
+
+    async function openMaintenances(vehicleId, plate) {
+      currentVehicleId = vehicleId;
+      document.getElementById('maint-title').textContent = 'Mantenimientos · ' + plate;
+      showView('maintenances');
+      const list = await api('/api/vehicles/' + vehicleId + '/maintenances') || [];
+      document.getElementById('maintenances-list').innerHTML = list.length
+        ? list.map(m => `
+          <div class="bg-white rounded-xl p-4 border">
+            <div class="flex justify-between">
+              <span class="font-medium">${m.type || 'Mantenimiento'}</span>
+              <span class="text-sm text-gray-500">${m.date}</span>
+            </div>
+            <p class="text-sm text-gray-600 mt-1">${m.description || ''}</p>
+            ${m.km ? `<p class="text-xs text-gray-500 mt-1">Km: ${m.km}</p>` : ''}
+            ${m.next_date ? `<p class="text-xs text-blue-600 mt-1">Próximo: ${m.next_date}</p>` : ''}
+            <button onclick="deleteMaintenance('${m.id}')" class="text-red-500 text-xs mt-2">Eliminar</button>
+          </div>`).join('')
+        : '<p class="text-center text-gray-400 py-8">Todavía no hay mantenimientos</p>';
     }
 
     function openClientModal() {
       const name = prompt('Nombre del cliente:');
       if (!name) return;
       const phone = prompt('Teléfono (opcional):') || '';
-      api('/api/clients', { method: 'POST', body: JSON.stringify({ name, phone }) }).then(() => loadClients());
+      api('/api/clients', { method: 'POST', body: JSON.stringify({ name, phone }) }).then(loadClients);
     }
 
     function openVehicleModal() {
-      if (!clients.length) return alert('Primero creá al menos un cliente');
-      const list = clients.map((c, i) => `${i + 1}. ${c.name}`).join('\n');
-      const idx = prompt('Elegí el número del cliente:\n\n' + list);
+      if (!clients.length) return alert('Primero creá un cliente');
+      const list = clients.map((c, i) => `${i+1}. ${c.name}`).join('\n');
+      const idx = prompt('Elegí el número del cliente:\n' + list);
       if (!idx) return;
-      const client = clients[parseInt(idx) - 1];
+      const client = clients[parseInt(idx)-1];
       if (!client) return alert('Número inválido');
-      const plate = prompt('Patente del vehículo:');
+      const plate = prompt('Patente:');
       if (!plate) return;
       const brand = prompt('Marca (opcional):') || '';
       const model = prompt('Modelo (opcional):') || '';
-      api('/api/vehicles', {
+      api('/api/vehicles', { method: 'POST', body: JSON.stringify({ client_id: client.id, plate, brand, model }) })
+        .then(() => { alert('Vehículo creado'); loadVehicles(); });
+    }
+
+    function openMaintenanceModal() {
+      if (!currentVehicleId) return;
+      const date = prompt('Fecha (AAAA-MM-DD):', new Date().toISOString().slice(0,10));
+      if (!date) return;
+      const type = prompt('Tipo de trabajo (ej: Cambio de aceite, Frenos, etc):') || '';
+      const description = prompt('Descripción / detalles:') || '';
+      const km = prompt('Kilometraje actual (opcional):') || null;
+      const next_date = prompt('Próximo mantenimiento (AAAA-MM-DD, opcional):') || null;
+
+      api('/api/maintenances', {
         method: 'POST',
-        body: JSON.stringify({ client_id: client.id, plate, brand, model })
+        body: JSON.stringify({
+          vehicle_id: currentVehicleId,
+          date,
+          type,
+          description,
+          km: km ? Number(km) : null,
+          next_date
+        })
       }).then(() => {
-        alert('Vehículo creado correctamente');
-        loadVehicles();
+        alert('Mantenimiento guardado');
+        openMaintenances(currentVehicleId, document.getElementById('maint-title').textContent.split('·')[1].trim());
       });
     }
 
     async function deleteClient(id) {
-      if (!confirm('¿Eliminar este cliente?')) return;
+      if (!confirm('¿Eliminar cliente?')) return;
       await api('/api/clients/' + id, { method: 'DELETE' });
       loadClients();
     }
     async function deleteVehicle(id) {
-      if (!confirm('¿Eliminar este vehículo?')) return;
+      if (!confirm('¿Eliminar vehículo?')) return;
       await api('/api/vehicles/' + id, { method: 'DELETE' });
       loadVehicles();
+    }
+    async function deleteMaintenance(id) {
+      if (!confirm('¿Eliminar este registro?')) return;
+      await api('/api/maintenances/' + id, { method: 'DELETE' });
+      openMaintenances(currentVehicleId, document.getElementById('maint-title').textContent.split('·')[1].trim());
     }
 
     function exportClientPDF() {
       if (!currentClientData) return;
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      doc.setFontSize(18);
-      doc.text('AlonsoTrack - Historial de Mantenimiento', 14, 22);
+      doc.setFontSize(16);
+      doc.text('AlonsoTrack - Historial', 14, 20);
       doc.setFontSize(11);
-      doc.text(`Patente: ${currentClientData.vehicle.plate}`, 14, 32);
-      doc.text(`Cliente: ${currentClientData.vehicle.client_name || '-'}`, 14, 39);
-      doc.text(`Vehículo: ${currentClientData.vehicle.brand || ''} ${currentClientData.vehicle.model || ''}`, 14, 46);
-      const rows = currentClientData.maintenances.map(m => [
-        m.date || '',
-        m.type || '',
-        m.description || '',
-        m.next_date || '-'
-      ]);
-      doc.autoTable({
-        startY: 54,
-        head: [['Fecha', 'Tipo', 'Descripción', 'Próximo']],
-        body: rows,
-        styles: { fontSize: 9 }
-      });
+      doc.text(`Patente: ${currentClientData.vehicle.plate}`, 14, 30);
+      doc.text(`Cliente: ${currentClientData.vehicle.client_name || '-'}`, 14, 37);
+      const rows = currentClientData.maintenances.map(m => [m.date, m.type || '', m.description || '', m.next_date || '-']);
+      doc.autoTable({ startY: 45, head: [['Fecha', 'Tipo', 'Descripción', 'Próximo']], body: rows });
       doc.save(`historial_${currentClientData.vehicle.plate}.pdf`);
     }
 
