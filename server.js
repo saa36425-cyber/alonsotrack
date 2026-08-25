@@ -39,18 +39,22 @@ function saveDB(db) {
 let db = loadDB();
 
 function authAdmin(req, res, next) {
-  const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
+  const authHeader = req.headers.authorization;
+  const token = authHeader ? authHeader.split(' ')[1] : null;
   if (!token) return res.status(401).json({ error: 'No autorizado' });
   try {
     req.admin = jwt.verify(token, JWT_SECRET);
     next();
-  } catch {
-    res.status(401).json({ error: 'Token inválido' });
+  } catch (err) {
+    return res.status(401).json({ error: 'Token inválido' });
   }
 }
 
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Usuario y contraseña requeridos' });
+  }
   if (username !== db.admin.username || !bcrypt.compareSync(password, db.admin.password)) {
     return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
   }
@@ -65,7 +69,7 @@ app.get('/api/clients', authAdmin, (req, res) => {
 app.post('/api/clients', authAdmin, (req, res) => {
   const client = {
     id: uuidv4(),
-    name: req.body.name,
+    name: req.body.name || '',
     phone: req.body.phone || '',
     email: req.body.email || '',
     notes: req.body.notes || '',
@@ -99,7 +103,8 @@ app.get('/api/vehicles', authAdmin, (req, res) => {
 });
 
 app.post('/api/vehicles', authAdmin, (req, res) => {
-  const plate = (req.body.plate || '').toUpperCase();
+  const plate = (req.body.plate || '').toUpperCase().trim();
+  if (!plate) return res.status(400).json({ error: 'La placa es obligatoria' });
   if (db.vehicles.some(v => v.plate === plate)) {
     return res.status(400).json({ error: 'La placa ya existe' });
   }
@@ -123,7 +128,8 @@ app.post('/api/vehicles', authAdmin, (req, res) => {
 app.put('/api/vehicles/:id', authAdmin, (req, res) => {
   const idx = db.vehicles.findIndex(v => v.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'No encontrado' });
-  db.vehicles[idx] = { ...db.vehicles[idx], ...req.body, plate: (req.body.plate || db.vehicles[idx].plate).toUpperCase() };
+  const plate = (req.body.plate || db.vehicles[idx].plate).toUpperCase();
+  db.vehicles[idx] = { ...db.vehicles[idx], ...req.body, plate };
   saveDB(db);
   res.json({ ok: true });
 });
@@ -178,7 +184,12 @@ app.get('/api/dashboard', authAdmin, (req, res) => {
     .slice(0, 8)
     .map(m => {
       const v = db.vehicles.find(v => v.id === m.vehicle_id);
-      return { ...m, plate: v ? v.plate : '', brand: v ? v.brand : '', model: v ? v.model : '' };
+      return {
+        ...m,
+        plate: v ? v.plate : '',
+        brand: v ? v.brand : '',
+        model: v ? v.model : ''
+      };
     });
 
   const upcoming = db.maintenances
@@ -206,8 +217,8 @@ app.get('/api/dashboard', authAdmin, (req, res) => {
 });
 
 app.post('/api/client-access', (req, res) => {
-  const plate = (req.body.plate || '').toUpperCase();
-  const code = (req.body.code || '').toUpperCase();
+  const plate = (req.body.plate || '').toUpperCase().trim();
+  const code = (req.body.code || '').toUpperCase().trim();
   const vehicle = db.vehicles.find(v => v.plate === plate && v.access_code === code);
   if (!vehicle) return res.status(401).json({ error: 'Placa o código incorrectos' });
   const client = db.clients.find(c => c.id === vehicle.client_id);
@@ -215,7 +226,12 @@ app.post('/api/client-access', (req, res) => {
     .filter(m => m.vehicle_id === vehicle.id)
     .sort((a, b) => b.date.localeCompare(a.date));
   res.json({
-    vehicle: { ...vehicle, client_name: client ? client.name : '', phone: client ? client.phone : '', email: client ? client.email : '' },
+    vehicle: {
+      ...vehicle,
+      client_name: client ? client.name : '',
+      phone: client ? client.phone : '',
+      email: client ? client.email : ''
+    },
     maintenances
   });
 });
@@ -225,10 +241,10 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log('\n========================================');
+  console.log('========================================');
   console.log('  AlonsoTrack corriendo!');
   console.log('  Puerto:', PORT);
   console.log('  Usuario: santiago');
   console.log('  Contraseña: alonso2026');
-  console.log('========================================\n');
+  console.log('========================================');
 });
