@@ -225,5 +225,10 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log('AlonsoTrack corriendo en puerto', PORT);
+  console.log('\n========================================');
+  console.log('  AlonsoTrack corriendo!');
+  console.log('  Puerto:', PORT);
+  console.log('  Usuario: santiago');
+  console.log('  Contraseña: alonso2026');
+  console.log('========================================\n');
 });
