@@ -188,4 +188,77 @@ app.delete('/api/maintenances/:id', authAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
-app.get('/api/dashboard', 
+app.get('/api/dashboard', authAdmin, (req, res) => {
+  const recent = db.maintenances
+    .slice()
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 8)
+    .map(m => {
+      const v = db.vehicles.find(v => v.id === m.vehicle_id);
+      return {
+        ...m,
+        plate: v ? v.plate : '',
+        brand: v ? v.brand : '',
+        model: v ? v.model : ''
+      };
+    });
+
+  const upcoming = db.maintenances
+    .filter(m => m.next_date)
+    .sort((a, b) => a.next_date.localeCompare(b.next_date))
+    .slice(0, 10)
+    .map(m => {
+      const v = db.vehicles.find(v => v.id === m.vehicle_id);
+      const c = v ? db.clients.find(c => c.id === v.client_id) : null;
+      return {
+        ...m,
+        plate: v ? v.plate : '',
+        brand: v ? v.brand : '',
+        model: v ? v.model : '',
+        client_name: c ? c.name : ''
+      };
+    });
+
+  res.json({
+    totalVehicles: db.vehicles.length,
+    totalClients: db.clients.length,
+    recent,
+    upcoming
+  });
+});
+
+app.post('/api/client-access', (req, res) => {
+  const plate = (req.body.plate || '').toUpperCase().trim();
+  if (!plate) return res.status(400).json({ error: 'Ingresá la patente' });
+
+  const vehicle = db.vehicles.find(v => v.plate === plate);
+  if (!vehicle) return res.status(404).json({ error: 'No se encontró un vehículo con esa patente' });
+
+  const client = db.clients.find(c => c.id === vehicle.client_id);
+  const maintenances = db.maintenances
+    .filter(m => m.vehicle_id === vehicle.id)
+    .sort((a, b) => b.date.localeCompare(a.date));
+
+  res.json({
+    vehicle: {
+      ...vehicle,
+      client_name: client ? client.name : '',
+      phone: client ? client.phone : '',
+      email: client ? client.email : ''
+    },
+    maintenances
+  });
+});
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log('========================================');
+  console.log('  AlonsoTrack corriendo!');
+  console.log('  Puerto:', PORT);
+  console.log('  Usuario: santiago');
+  console.log('  Contraseña: alonso2026');
+  console.log('========================================');
+});
